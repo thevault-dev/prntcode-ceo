@@ -1,0 +1,11 @@
+{
+  "name": "prntcode-ceo",
+  "version": "1.0.0",
+  "description": "PRNTCODE CEO agent v1: daily sync of Khaled's Notion tasks into the Coordinator ledger, plus the Monday Pack with 'Your time asks'.",
+  "author": {
+    "name": "PRNTCODE",
+    "email": "thevault@prntcode.com"
+  },
+  "repository": "https://github.com/thevault-dev/prntcode-ceo",
+  "keywords": ["prntcode", "chief-of-staff", "coordinator", "notion", "monday-pack"]
+}

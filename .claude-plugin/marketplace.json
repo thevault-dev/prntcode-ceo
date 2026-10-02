@@ -1,0 +1,20 @@
+{
+  "name": "prntcode-ceo",
+  "owner": {
+    "name": "PRNTCODE",
+    "email": "thevault@prntcode.com"
+  },
+  "metadata": {
+    "description": "Khaled's PRNTCODE agent: a CEO router with a live Chief of Staff that feeds the Coordinator ledger and runs the Monday Pack.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "prntcode-ceo",
+      "source": "./plugins/prntcode-ceo",
+      "description": "PRNTCODE CEO agent v1: daily sync of Khaled's Notion tasks into the Coordinator ledger, plus the Monday Pack with 'Your time asks'.",
+      "version": "1.0.0",
+      "category": "productivity"
+    }
+  ]
+}
