@@ -89,10 +89,11 @@ Leave the Claude app running with the laptop awake (or set to wake). A scheduled
 
 ```
 PRNTCODE sync — Fri 2 Oct, 06:30
-Posted 3 · Updated 1 · Withdrawn 1 · Skipped 9 · Unchanged 6
+Posted 4 · Updated 1 · Withdrawn 1 · Skipped 9 · Unchanged 6
 
 Posted
 • Review Deepwear redlines — Deepwear — 90m · due Sun 11 Oct
+• ⏰ Set pricing — Wildflower - Abayas — 60m · catch-up by Mon 5 Oct (was due 16 Sep)
 Updated
 • POS setup — Cactus District Round 2 — due 16 Oct → 23 Oct (duration kept)
 Withdrawn
@@ -101,7 +102,7 @@ Booked but no longer needed
 • Book the factory visit — WILDFLOWER SUMMER (Mon 5 Oct 10:00).
   Booked but no longer needed. Say "drop Book the factory visit" to remove it.
 Skipped
-• Overdue (2): Set pricing (was due 16 Sep) · …
+• Overdue (2): Story collection page (WOB) (22 May, >21 days) · Projectors (project not active)
 • Undated (1): …
 • Over cap (1): …
 • No block needed (4): Invite to Mirbad (quick errand) · …
@@ -112,11 +113,17 @@ Skipped
 1. **Candidates:** tasks where **you** are in `Assigned to` and `Status` isn't `!!وصلنا`. Tasks assigned only to Hessa or Harizel are never touched.
 2. **Needs your time?** The agent guesses, and no new Notion fields are needed. Reviewing, deciding, writing, calls and prep count. Errands under about 15 minutes, and work someone else carries out, don't.
 3. **How long?** It estimates 30 to 240 minutes in 30-minute steps. The reasoning goes into the ledger as one line, e.g. `Est. 90m: review Deepwear redlines + reply`.
-4. **Due date:** the task's due date. A date with no time means **23:59 Abu Dhabi**. If the task has no date, it uses the project's D-Day. If neither exists, the task is skipped and listed as **undated**. Past-due tasks are skipped and listed as **overdue**; they're never posted.
-5. **Stable:** it reads the ledger first and writes only when the **title or due date** changed in Notion. Once posted, the duration and priority are **never re-guessed**. A second run with no Notion changes writes **zero** rows.
-6. **Cap:** at most **8 new posts per run**, earliest due first. The rest are listed and tried again tomorrow.
-7. **Withdraw:** a posted task that's marked done, deleted, or unassigned from you is withdrawn from the Coordinator. If the Coordinator already **booked** it, it's left alone and listed so you can decide.
-8. Recurring items ("weekly…") are skipped, because Coordinator intake handles them.
+4. **Due date:** the task's due date. A date with no time means **23:59 Abu Dhabi**. If the task has no date, it uses the project's D-Day. If neither exists, the task is skipped and listed as **undated**.
+5. **Overdue → catch-up, not ignored.** A missed deadline can't be booked as it is, because the Coordinator places blocks *before* `due_by`. So a task that is overdue by **21 days or less**, on a project that's **In progress** or **Always on…**, gets a **catch-up block**:
+   - due **3 days from today** (or the project's D-Day, if that's sooner),
+   - priority **2**,
+   - context starting `Overdue since 16 Sep — catch-up…`.
+
+   It's posted once. The catch-up date is never pushed again, and if you re-date the task in Notion, the sync follows your new date. Older overdue tasks, or ones on projects that are on hold, not started or done, are listed as **overdue** with the reason, so they still reach you.
+6. **Stable:** it reads the ledger first and writes only when the **title or due date** changed in Notion. Once posted, the duration and priority are **never re-guessed**. A second run with no Notion changes writes **zero** rows.
+7. **Cap:** at most **8 new posts per run**, catch-ups included, earliest due first. The rest are listed and tried again tomorrow.
+8. **Withdraw:** a posted task that's marked done, deleted, or unassigned from you is withdrawn from the Coordinator. If the Coordinator already **booked** it, it's left alone and listed so you can decide.
+9. Recurring items ("weekly…") are skipped, because Coordinator intake handles them.
 
 ### Priority mapping
 
@@ -131,7 +138,7 @@ The tracker's `Priority` is a Notion formula. On **2 Oct 2026** the Notion conne
 | Someday / ⚪ / P4 | 5 |
 | **Unreadable (today)** | **3** |
 
-In practice, every post gets priority **3** until Notion exposes the formula's value. The Coordinator still sees each task's due date.
+In practice, every post gets priority **3** until Notion exposes the formula's value. The exception is catch-ups, which always get **2**. The Coordinator still sees each task's due date.
 
 ## The ledger contract (what this agent writes)
 
@@ -199,4 +206,4 @@ Guess-accuracy tracking (planned for the Auditor), reopening declined items when
 | The 06:30 sync didn't run | The Claude app was closed or the laptop asleep. Run `sync my PRNTCODE time` by hand; it's safe to run any time. |
 | A task you need time for was "No block needed" | Add a word to the task title or Notes that makes it clear you must do it ("review…", "decide…", "write…"). The next sync re-judges it. |
 
-**Version:** 1.0.0
+**Version:** 1.1.0 (adds overdue catch-ups)
