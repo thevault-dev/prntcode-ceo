@@ -68,7 +68,7 @@ Also count rows still waiting for the Coordinator (`status = 'new'`), for a one-
 
 Then compute the tasks the sync **skipped** from the data already pulled in step 1, using the sync's rules. Take open tasks with Khaled (`319cf6a3-548f-4fd3-b017-0514c79713b3`) in `Assigned to`:
 - **Undated**: no `Task Due Date` and no D-Day on any linked project.
-- **Overdue**: due date (the task date, or else the project D-Day; date-only means 23:59 Abu Dhabi) already passed.
+- **Overdue**: due date (the task date, or else the project D-Day; date-only means 23:59 Abu Dhabi) already passed, **and** the task has no `prntcode` row in the ledger. Check with `select source_ref from public.requests where source_agent = 'prntcode'`; source_ref is the page ID as a dashed UUID. Overdue tasks that the sync gave a catch-up block already appear in the groups above (their note starts "Overdue since …"), so don't list them twice.
 
 If the ledger can't be reached, still produce the rest of the pack. Replace this section with one line: "Your time asks: ledger unreachable (check the Supabase connector)."
 

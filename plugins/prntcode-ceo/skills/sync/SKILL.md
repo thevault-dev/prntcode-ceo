@@ -88,7 +88,23 @@ For every task from 1a, in this order:
 
 Write it as `YYYY-MM-DDTHH:MM:SSZ` so it compares directly with `due_by_utc`.
 
-**3c. Overdue.** If due by is earlier than now → **skip: overdue**. Never post it, and don't touch any existing row for it. List it with its old due date.
+**3c. Overdue.** If due by is earlier than now, the task is overdue. Overdue never means "ignore": recent ones on live projects get a **catch-up** block, and the rest are listed.
+
+- **Already has a ledger row** (any status) → never change it because of the old date. Writing a past `due_by` would make the block impossible to schedule.
+  - If the row's `context` starts with `Overdue since` it's a catch-up row. Count it as **unchanged** and don't list it as overdue.
+  - Otherwise, leave the row alone and list the task under overdue.
+  - If Khaled later gives the task a new future date in Notion, it's no longer overdue, and step 3e updates `due_by` as normal.
+- **No ledger row, and catch-up eligible**: all three of these hold:
+  1. it's overdue by **21 days or less** (Notion due date ≥ now − 21 days),
+  2. at least one linked project has `Project Status` = `In progress` or `Always on...` (or `Up Next`, if that status is ever added). Tasks with no linked project, or only projects that are `Done`, `On hold` or `Not started`, aren't eligible,
+  3. it passes 3d (not recurring) and 3f (needs a block of Khaled's time).
+
+  Then treat it as a new post with these overrides:
+  - `due_by` = **23:59 Abu Dhabi, 3 days from today** (`19:59:00Z` that date). If the project's D-Day is still in the future and comes earlier, use the D-Day at 23:59 instead.
+  - `priority` = **2**.
+  - `context` = `Overdue since <D Mon> — catch-up, est. <N>m: <what for>` (e.g. `Overdue since 16 Sep — catch-up, est. 60m: sign off Wildflower Abaya prices`).
+  - The catch-up due date is set **once**, at first post. It's never recalculated, and a task gets at most one catch-up. If that block passes or is declined, the existing-row rules apply (left alone, listed).
+- **No ledger row, not eligible** → **skip: overdue**. List it with its old due date and a short reason: `>21 days` or `project not active`.
 
 **3d. Recurring.** If the task is plainly a repeating chore ("weekly…", "every Monday…", "monthly report") → **skip: recurring**. Recurring items belong to Coordinator intake.
 
@@ -128,11 +144,11 @@ Example: `Est. 90m: review Deepwear redlines + reply`.
 | Someday / Nice to have / ⚪ / P4 | 5 |
 | **Unreadable or empty (the current reality)** | **3** |
 
-Don't invent a priority from your own sense of urgency. The Coordinator already sees `due_by`. Priority is set once at first post and never changed after.
+Don't invent a priority from your own sense of urgency. The Coordinator already sees `due_by`. The one exception is catch-ups (3c), which are always **2**. Priority is set once at first post and never changed after.
 
 ## 4. Cap new posts at 8
 
-Sort the new posts by `due_by` (earliest first), then by priority. Post the first **8**. The rest are **skipped: over cap**. List them, and they'll be considered again next run.
+Catch-ups count toward the cap. Sort all new posts (catch-ups included) by `due_by` (earliest first), then by priority. Post the first **8**. The rest are **skipped: over cap**. List them, and they'll be considered again next run.
 
 ## 5. Write: the one upsert (top half only)
 
@@ -156,6 +172,7 @@ returning source_ref, title, (xmax = 0) as inserted;
 ```
 
 - For **updates**, still fill every column in `values` (use the row's existing duration, priority and context). The `do update` clause only ever changes `title` and `due_by`, so duration, priority, context and earliest start can't be overwritten even by mistake.
+- The ledger has its own check, `due_by > earliest_start`. Because `earliest_start` is `now()`, a past `due_by` makes the database **reject the whole statement**, so one bad row would block every post in the run. Filter overdue dates out first (step 3c); only catch-up dates, which are always in the future, go in. If the statement errors anyway, nothing was written: report the error and stop.
 - The `where` guard means an unchanged row is never touched. This matters because the ledger's trigger stamps `updated_at` on every UPDATE, and that alone would make it show as "changed" in the Coordinator digest.
 - `inserted = true` → posted. `inserted = false` → updated. A row that isn't returned had no write.
 - If nothing is queued, don't run the statement at all.
@@ -190,6 +207,7 @@ Posted 3 · Updated 1 · Withdrawn 1 · Skipped 9 · Unchanged 6
 
 **Posted**
 • Review Deepwear redlines — Deepwear — 90m · due Sun 11 Oct
+• ⏰ Set pricing — Wildflower - Abayas — 60m · catch-up by Mon 5 Oct (was due 16 Sep)
 **Updated**
 • POS setup — Cactus District Round 2 — due 16 Oct → 23 Oct (duration kept)
 **Withdrawn**
@@ -197,7 +215,7 @@ Posted 3 · Updated 1 · Withdrawn 1 · Skipped 9 · Unchanged 6
 **Booked but no longer needed**
 • Book the factory visit — WILDFLOWER SUMMER (Mon 5 Oct 10:00). Say "drop Book the factory visit" to remove it.
 **Skipped**
-• Overdue (2): Set pricing (was due 16 Sep) · Sign the collection budget (14 Sep)
+• Overdue (2): Story collection page (WOB) (22 May, >21 days) · Projectors (4 Mar, project not active)
 • Undated (1): Brainstorm launch ideas
 • Over cap (1): …
 • No block needed (4): Invite to Mirbad (quick errand) · Trunk Show (Hessa executes) · …
@@ -219,7 +237,7 @@ This agent can't remove a booked block, because only the Coordinator writes cale
 2. **Only two write paths:** the upsert in step 5 and `public.agent_withdraw`. No `update`, no `delete`, no other function, and never the bottom-half columns.
 3. **Never re-guess** duration, priority or context on a row that exists.
 4. **At most 8 new posts per run.**
-5. **Never post** an overdue, undated or recurring task, or one not assigned to Khaled.
+5. **Never post** an undated or recurring task, or one not assigned to Khaled. Overdue tasks are posted **only** through the catch-up rule (3c), never with their past due date.
 6. **Never write to a calendar.**
 7. **A failed read means no writes.** If Notion or the ledger can't be read, stop and say so plainly. Never fabricate a summary.
 8. A second run with no Notion changes must write **zero** rows. If you're about to write, check that a title or due date really changed.

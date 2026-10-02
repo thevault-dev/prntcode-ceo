@@ -13,7 +13,8 @@ All checks ran against the **live** tracker and ledger. Nothing was left in the 
 | Upsert: identical second run writes **0** rows | ✅ |
 | Upsert: due-date change updates `due_by` only (duration, priority and context kept) | ✅ |
 | Upsert never touches a declined row | ✅ |
-| `tests/prntcode_contract_check.sql` | ✅ ALL PRNTCODE CONTRACT CHECKS PASSED |
+| Ledger refuses a past `due_by` (`requests_window_check`), so a catch-up row can't slide back to its overdue date | ✅ |
+| `tests/prntcode_contract_check.sql` (v1.1) | ✅ ALL PRNTCODE CONTRACT CHECKS PASSED |
 | "Your time asks" query, week = Mon 28 Sep 00:00 Abu Dhabi | ✅ returns the 6 proposed prntcode rows |
 
 ## Sync dry run (read-only, no writes)
@@ -23,10 +24,17 @@ Khaled's open tasks: 63. Ledger rows for `prntcode`: 6, all `proposed`, posted 3
 - **Unchanged (6):** Get back to them — Vibey Pop Up · Book the factory visit — WILDFLOWER SUMMER · Issue the PO — WILDFLOWER SUMMER · Have a backup for Harizel — Cactus District Round 2 · POS setup — Cactus District Round 2 · Come up with concept — PRNTCODE House Launch Event. Title and due date match exactly, so **0 writes**.
 - **Withdraw:** none. All 6 tasks are still open and assigned to Khaled.
 - **New dated candidate (1):** Book tickets — Premier Vision - NYC (due 21 Jan 2027). Judged a quick errand, so no block.
-- **Overdue (~20):** e.g. Sign the collection budget (14 Sep), Set pricing (16 Sep), Hire the design freelancer (25 Sep), Calculate for the price (29 Sep), plus Website tasks whose project D-Day (22 May) has passed.
+- **Catch-up candidates (v1.1, overdue ≤ 21 days on an active project) (4):**
+  - Sign the collection budget (14 Sep), WILDFLOWER SUMMER
+  - Set pricing (16 Sep), Wildflower - Abayas. Catch-up due is capped at the project D-Day, 7 Oct.
+  - Hire the design freelancer (25 Sep), The Boring Stuff: Admin
+  - Calculate for the price (29 Sep), BRED AD
+
+  Each still has to pass the "needs Khaled's time" check. Priority 2.
+- **Overdue, listed only (~17):** older than 21 days (Website tasks against a 22 May D-Day, WPS, FLTR KOFI…), or on projects that are on hold or done (MIZA, Al Maisan, MANEBI…). Come up with proposal (15 Sep) has no linked project, so it's listed only.
 - **Undated (~35):** tasks with no due date on projects with no D-Day (Studio, Operations & Systems, Finance time with Raju, The Boring Stuff: Admin, 25 hour hotel, and others).
 
-Expected first live run: **Posted 0 · Updated 0 · Withdrawn 0 · Unchanged 6**, with the skipped lists.
+Expected first live run (v1.1): **Posted up to 4 catch-ups · Updated 0 · Withdrawn 0 · Unchanged 6**, with the skipped lists. A second run straight after writes **0** rows.
 
 ## Not verified from this session
 

@@ -50,6 +50,17 @@ begin
     'check 3: duration/priority/context were re-guessed';
   assert r.status = 'proposed', 'check 3: status changed';
 
+  -- 3b. The ledger refuses a past due date (due_by must be after earliest_start = now()),
+  --     so a catch-up row can never be moved back to its old overdue date.
+  begin
+    execute format(upsert, 'Khaled''s check — Proj', 'x', 30, '2026-01-01T19:59:00Z', 3) into n;
+    e := 'accepted';
+  exception when check_violation then e := 'refused';
+  end;
+  select * into r from public.requests where source_agent = 'prntcode' and source_ref = '__check';
+  assert e = 'refused', 'check 3b: a past due_by was accepted';
+  assert r.due_by = '2026-12-05T19:59:00Z'::timestamptz, 'check 3b: due_by moved into the past';
+
   -- 4. agent_withdraw: proposed -> declined with the note.
   r := public.agent_withdraw('prntcode', '__check', 'task marked done in Notion');
   assert r.status = 'declined', 'check 4: withdraw did not decline';
