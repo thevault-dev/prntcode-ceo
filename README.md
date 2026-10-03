@@ -5,6 +5,7 @@
 Khaled's PRNTCODE agent, **v1**. The **CEO** is a thin router. The **Chief of Staff** is the one live role:
 
 - **Sync** (`/prntcode-ceo:sync`, daily at **06:30 Abu Dhabi**): reads the team tracker "Get Sh\*t done!!!", picks the tasks that need a block of *your* time, and posts them to your Coordinator. That happens 30 minutes before the Coordinator's 07:00 run.
+- **Close task** (`/prntcode-ceo:close-task`): when you tell the Coordinator's digest a PRNTCODE item is done or not needed, the Chief of Staff closes that one task in the tracker straight away. See [Closing a task from the digest](#closing-a-task-from-the-digest).
 - **Monday Pack**: the same pack as before, plus a new **Your time asks** section showing what the Coordinator did with each ask.
 
 The other seven departments have a charter only: what they'll own and which existing skills will move under them. See [`plugins/prntcode-ceo/org/`](plugins/prntcode-ceo/org/README.md).
@@ -38,7 +39,7 @@ On a laptop, in **claude.ai**:
 4. Paste `thevault-dev/prntcode-ceo` and confirm.
 5. Turn **Sync automatically** **on**. Updates then arrive by themselves.
 6. Find **prntcode-ceo** in the list and click **Install**.
-7. Check it worked: start a new chat, type `/prntcode-ceo:` and you should see **sync**, **monday-pack** and **ceo**.
+7. Check it worked: start a new chat, type `/prntcode-ceo:` and you should see **sync**, **close-task**, **monday-pack** and **ceo**.
 
 **Turn off the old Monday Pack** so two copies don't compete:
 **Customize → Skills →** find the standalone **monday-pack** → switch it **off**. The plugin's copy is the same skill plus *Your time asks*.
@@ -83,6 +84,7 @@ Leave the Claude app running with the laptop awake (or set to wake). A scheduled
 |---|---|
 | `sync my PRNTCODE time` or `/prntcode-ceo:sync` | Runs the sync now and replies with the summary |
 | `monday pack` or `/prntcode-ceo:monday-pack` | The Monday Pack, with **Your time asks** |
+| `close PRNTCODE task <ref> as not_needed: <reason>` | Closes that one tracker task (normally sent by the Coordinator for you) |
 | `drop X` (after a sync lists a booked block you no longer need) | Say it to your **Coordinator**, which owns the calendar. The PRNTCODE agent can't remove booked blocks. |
 
 ### What the sync summary looks like
@@ -140,9 +142,49 @@ The tracker's `Priority` is a Notion formula. On **2 Oct 2026** the Notion conne
 
 In practice, every post gets priority **3** until Notion exposes the formula's value. The exception is catch-ups, which always get **2**. The Coordinator still sees each task's due date.
 
+## Closing a task from the digest
+
+When the Coordinator's digest shows a PRNTCODE task that's already done or no longer needed, you reply in that chat (e.g. `2 not needed — her visa came through`). The Coordinator never writes to Notion, so it hands the item to this agent, which closes **only that task**:
+
+1. Checks the ledger row is a PRNTCODE request, and its `source_ref` is a page in **Get Sh\*t done!!!**. Anything else is refused.
+2. Sets **Status**: `done` → `!!وصلنا`; `not_needed` → a Cancelled / Not-needed status **if the tracker has one**, otherwise `!!وصلنا`. Today there is none (options: Not started, On hold, In progress, !!وصلنا). Add one in Notion if you want "not needed" kept separate; the agent picks it up automatically. It never creates status options itself.
+3. Adds one comment: `Closed by Khaled via Coordinator digest — not needed: her visa came through — 3 Oct 2026`.
+4. Stamps the ledger (`agent_mark_tracker_closed`) and replies in one line: `Closed in tracker: Backup for Harizel — not needed (her visa came through)`.
+
+Already closed → nothing changes, and it says so. No other task, property or page is touched. Your reply is the approval; it doesn't ask again.
+
+**Safety net.** If the instant close fails (Notion down, chat closed), the row keeps `resolution` set with no `tracker_closed_at`. The next `sync` closes it the same way and lists it under *Closed in tracker*.
+
+**The other way round.** Close a task by hand in Notion and the next `sync` withdraws its open ledger request (`withdrawn by prntcode: task marked done in Notion`), so it drops off the digest. A block that's already **booked** is left alone and listed, as before.
+
+### Handoff contract (for the Coordinator)
+
+The Coordinator asks for a close with one line per item, in the same chat:
+
+```
+close PRNTCODE task <source_ref> as <done|not_needed>: <reason>
+```
+
+| Part | Value |
+|---|---|
+| `<source_ref>` | the ledger row's `source_ref` (Notion page ID, dashed UUID). The row's `id` also works. |
+| outcome | `done` for `resolution = done_elsewhere`, `not_needed` for `resolution = not_needed` |
+| `<reason>` | Khaled's words, unedited; `no reason given` if he gave none |
+
+Equivalent: invoke the skill **`prntcode-ceo:close-task`** with that line as its argument.
+
+What the Coordinator must do **before** handing off: set the row's `resolution` (its own function, next brief). That's what lets the safety net finish the job if the instant close fails. Keep Khaled's reason in `decision_note` after a `: ` so the safety net can quote it.
+
+What comes back: exactly one line per item, one of
+- `Closed in tracker: <task> — <done | not needed> (<reason>)`
+- `Already closed in tracker: <task> — status <status>. Nothing changed.`
+- `Not closed: <ref> isn't one of my PRNTCODE ledger requests.` / `Not closed: <ref> isn't a task in the PRNTCODE tracker.` / `Not closed: <error>`
+
+What this agent never does: change the row's `status`, `resolution` or the Coordinator's bottom half. Status handling stays with the Coordinator. The sync also never withdraws a row that has `resolution` set.
+
 ## The ledger contract (what this agent writes)
 
-Coordinator ledger: Supabase project `coordinator` (`hgkreprqxevayruqpibf`), table `public.requests`. The contract is defined in the Coordinator's README. This agent uses **only** these two write paths:
+Coordinator ledger: Supabase project `coordinator` (`hgkreprqxevayruqpibf`), table `public.requests`. The contract is defined in the Coordinator's README. This agent uses **only** these three write paths:
 
 **1. Upsert, top half only**, keyed on (`source_agent`, `source_ref`):
 
@@ -162,6 +204,8 @@ Coordinator ledger: Supabase project `coordinator` (`hgkreprqxevayruqpibf`), tab
 On conflict, it only ever changes `title` and `due_by`, and only when one of them actually changed and the row is `new`, `proposed` or `scheduled`.
 
 **2. `public.agent_withdraw(p_source_agent, p_source_ref, p_reason)`**: moves a `new` or `proposed` row to `declined` with the note `withdrawn by prntcode: <reason>`. It refuses `scheduled` rows and rows it can't find, and is granted to `service_role` only.
+
+**3. `public.agent_mark_tracker_closed(p_request_id)`**: stamps `tracker_closed_at = now()` after close-task closed the Notion task. Refuses rows that aren't `prntcode`'s and missing rows; calling it twice is harmless. It doesn't bump `updated_at`, so a stamped row never shows as "changed" in the digest. Migration `20261003081504 close_task_resolution`, which also adds `resolution` (`done_elsewhere` | `not_needed`, set by the Coordinator).
 
 It never writes the bottom half (`status`, `slot_*`, `calendar_event_id`, `decision_note`, `decided_at`) and never writes a calendar.
 
@@ -184,7 +228,8 @@ plugins/prntcode-ceo/
   .claude-plugin/plugin.json
   skills/
     ceo/                               CEO: thin router
-    sync/                              Chief of Staff: Notion → ledger feed
+    sync/                              Chief of Staff: Notion → ledger feed (+ close-task safety net)
+    close-task/                        Chief of Staff: close one tracker task from the digest
     monday-pack/                       Chief of Staff: Monday Pack (+ Your time asks)
   org/                                 one charter README per role (9)
 docs/org-chart.svg                     the chart above
@@ -206,4 +251,4 @@ Guess-accuracy tracking (planned for the Auditor), reopening declined items when
 | The 06:30 sync didn't run | The Claude app was closed or the laptop asleep. Run `sync my PRNTCODE time` by hand; it's safe to run any time. |
 | A task you need time for was "No block needed" | Add a word to the task title or Notes that makes it clear you must do it ("review…", "decide…", "write…"). The next sync re-judges it. |
 
-**Version:** 1.1.0 (adds overdue catch-ups)
+**Version:** 1.2.0 (adds close-task from the Coordinator digest)

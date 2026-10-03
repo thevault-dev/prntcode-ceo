@@ -1,6 +1,6 @@
 ---
 name: sync
-description: Chief of Staff ledger feed. Reads Khaled's open tasks from the PRNTCODE Notion tracker "Get Sh*t done!!!", decides which need a focused block of Khaled's own time, posts those to the Coordinator ledger (Supabase), withdraws ones no longer needed, and ends with a phone-readable summary. Use when Khaled says "sync", "sync my PRNTCODE time", "sync PRNTCODE", "post my PRNTCODE tasks to the Coordinator", "what PRNTCODE time do I need", or runs /prntcode-ceo:sync. Also runs as the daily 06:30 Abu Dhabi scheduled task. Never writes to Notion or to any calendar.
+description: Chief of Staff ledger feed. Reads Khaled's open tasks from the PRNTCODE Notion tracker "Get Sh*t done!!!", decides which need a focused block of Khaled's own time, posts those to the Coordinator ledger (Supabase), withdraws ones no longer needed, closes tasks Khaled already marked done or not needed in the Coordinator digest (safety net), and ends with a phone-readable summary. Use when Khaled says "sync", "sync my PRNTCODE time", "sync PRNTCODE", "post my PRNTCODE tasks to the Coordinator", "what PRNTCODE time do I need", or runs /prntcode-ceo:sync. Also runs as the daily 06:30 Abu Dhabi scheduled task. Never writes to any calendar; writes to Notion only through the close-task safety net.
 ---
 
 # PRNTCODE sync: Notion → Coordinator ledger
@@ -63,7 +63,8 @@ Project URLs also come in both forms. Compare them by that 32-hex ID, not by the
 ## 2. Read the ledger
 
 ```sql
-select source_ref, title, status, duration_min, priority, context,
+select id, source_ref, title, status, duration_min, priority, context,
+       resolution, tracker_closed_at,
        to_char(due_by at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as due_by_utc,
        to_char(slot_start at time zone 'Asia/Dubai', 'Dy DD Mon HH24:MI') as slot_local,
        decision_note
@@ -179,9 +180,27 @@ returning source_ref, title, (xmax = 0) as inserted;
 
 Never write `status`, `slot_start`, `slot_end`, `calendar_event_id`, `decision_note` or `decided_at`. That's the Coordinator's bottom half.
 
+## 6a. Safety net: close what Khaled closed from the digest
+
+When Khaled replies to the Coordinator digest that a PRNTCODE item is done or not needed, the Coordinator sets the row's `resolution` and hands it to the **close-task** skill straight away. If that instant close failed (Notion down, chat closed), the row is left with `resolution` set and `tracker_closed_at` empty. Pick those up here:
+
+```sql
+select id, source_ref, title, resolution, decision_note
+from public.requests
+where source_agent = 'prntcode'
+  and resolution is not null
+  and tracker_closed_at is null;
+```
+
+For each row, follow `skills/close-task/SKILL.md` steps 2–6 exactly, with:
+- outcome: `done_elsewhere` → `done`, `not_needed` → `not_needed`,
+- reason: the text after the last `: ` in `decision_note` if the Coordinator stored Khaled's words there, otherwise `no reason given`.
+
+Its rules hold here too: one page per row, only `Status` + one comment, already-closed pages are only stamped, a refused or failed row is listed and **not** stamped (so it's retried next run). Count each under *Closed in tracker* in the summary.
+
 ## 6. Withdraw on change
 
-Take every ledger row with status `new`, `proposed` or `scheduled` whose `source_ref` is **not** among this run's candidates (1a). For each one, `notion-fetch` the page (the source_ref works as an ID) to find out why:
+Take every ledger row with status `new`, `proposed` or `scheduled` whose `source_ref` is **not** among this run's candidates (1a), **and whose `resolution` is null**. A row with `resolution` set was closed from the digest; its status belongs to the Coordinator, so it's never withdrawn here. For each one, `notion-fetch` the page (the source_ref works as an ID) to find out why:
 
 | Fetch shows | Reason |
 |---|---|
@@ -203,7 +222,7 @@ Keep it short. No tables, no prose padding. Dates are Abu Dhabi local, like `Sun
 
 ```
 **PRNTCODE sync — Fri 2 Oct, 06:30**
-Posted 3 · Updated 1 · Withdrawn 1 · Skipped 9 · Unchanged 6
+Posted 3 · Updated 1 · Withdrawn 1 · Closed 1 · Skipped 9 · Unchanged 6
 
 **Posted**
 • Review Deepwear redlines — Deepwear — 90m · due Sun 11 Oct
@@ -212,6 +231,8 @@ Posted 3 · Updated 1 · Withdrawn 1 · Skipped 9 · Unchanged 6
 • POS setup — Cactus District Round 2 — due 16 Oct → 23 Oct (duration kept)
 **Withdrawn**
 • Issue the PO — WILDFLOWER SUMMER — marked done
+**Closed in tracker** (from the digest)
+• Backup for Harizel — WILDFLOWER SUMMER — not needed
 **Booked but no longer needed**
 • Book the factory visit — WILDFLOWER SUMMER (Mon 5 Oct 10:00). Say "drop Book the factory visit" to remove it.
 **Skipped**
@@ -233,8 +254,8 @@ This agent can't remove a booked block, because only the Coordinator writes cale
 
 ## Hard rules
 
-1. **Notion is read-only here.** Never create, edit or archive anything in Notion from this skill.
-2. **Only two write paths:** the upsert in step 5 and `public.agent_withdraw`. No `update`, no `delete`, no other function, and never the bottom-half columns.
+1. **Notion is read-only here, except step 6a.** The only Notion writes are close-task's (one `Status` + one comment) on rows with `resolution` set. Never create, edit or archive anything else.
+2. **Only three ledger write paths:** the upsert in step 5, `public.agent_withdraw`, and `public.agent_mark_tracker_closed` (step 6a). No `update`, no `delete`, no other function, and never the bottom-half columns or `resolution`.
 3. **Never re-guess** duration, priority or context on a row that exists.
 4. **At most 8 new posts per run.**
 5. **Never post** an undated or recurring task, or one not assigned to Khaled. Overdue tasks are posted **only** through the catch-up rule (3c), never with their past due date.

@@ -1,5 +1,7 @@
 # Coordinator repo handoff: `agent_withdraw`
 
+> **Resolved 3 Oct 2026.** The close-task build had access to `thevault-dev/coordinator` and added `supabase/migrations/20260930191251_agent_withdraw.sql`, the README entry, the definition-of-done checks and a version bump there. This page is kept for history.
+
 Brief must-have 4 asks for `agent_withdraw` in `thevault-dev/coordinator`. This build session **couldn't open that repo** (access to it wasn't granted to the session), so the repo side couldn't be checked or pushed from here.
 
 ## What is already true in the live ledger (checked 2 Oct 2026)
