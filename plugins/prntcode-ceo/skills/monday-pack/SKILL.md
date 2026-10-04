@@ -45,7 +45,7 @@ Fetch the most recent page in the Monday Packs archive (if it exists) — it con
 
 ### 1b. Pull your time asks (added in the prntcode-ceo plugin)
 
-This step is read-only. It reports what Khaled's Coordinator did with the time blocks the Chief of Staff's daily sync (`/prntcode-ceo:sync`) asked for. Ledger: Supabase project `hgkreprqxevayruqpibf`, table `public.requests`. "This week" means Monday 00:00 to Sunday 24:00, Abu Dhabi time (`Asia/Dubai`, UTC+4).
+This step is read-only. It reports what Khaled's Coordinator did with the time blocks the Chief of Staff's half-week refresh (`/prntcode-ceo:refresh`) asked for. Ledger: Supabase project `hgkreprqxevayruqpibf`, table `public.requests`. "This week" means Monday 00:00 to Sunday 24:00, Abu Dhabi time (`Asia/Dubai`, UTC+4).
 
 ```sql
 with wk as (
@@ -66,7 +66,7 @@ Bumped and declined rows usually have no slot, so the query includes those decid
 
 Also count rows still waiting for the Coordinator (`status = 'new'`), for a one-line footnote.
 
-Then compute the tasks the sync **skipped** from the data already pulled in step 1, using the sync's rules. Take open tasks with Khaled (`319cf6a3-548f-4fd3-b017-0514c79713b3`) in `Assigned to`:
+Then compute the tasks the refresh **skipped** from the data already pulled in step 1, using the refresh's rules. Take open tasks with Khaled (`319cf6a3-548f-4fd3-b017-0514c79713b3`) in `Assigned to`:
 - **Undated**: no `Task Due Date` and no D-Day on any linked project.
 - **Overdue**: due date (the task date, or else the project D-Day; date-only means 23:59 Abu Dhabi) already passed, **and** the task has no `prntcode` row in the ledger. Check with `select source_ref from public.requests where source_agent = 'prntcode'`; source_ref is the page ID as a dashed UUID. Overdue tasks that the sync gave a catch-up block already appear in the groups above (their note starts "Overdue since …"), so don't list them twice.
 
@@ -99,7 +99,9 @@ Generate a numbered proposal queue. Three proposal types:
 
 **C. Questions** — things only the user can resolve, e.g.: in-progress projects with **no D-Day** ("deadline-driven or should it move to Always on...?"), projects with `Needs Content = Yeah` but zero content tasks, duplicate project titles that need merging, D-Day collisions (two events on the same date), and unassigned tasks on 🔴 projects.
 
-### 5. Present the pack (in chat, phone-readable)
+### 5. Present the pack (phone-readable)
+
+**When the refresh runs it on Sunday (refresh step 7e)**, the pack is **its own artifact**: a separate document titled `Monday Pack — Mon 5 Oct`. If the runtime can't make artifacts, it's the Notion archive page from step 7. The chat gets only a one-line link, never the pack itself. Asked directly ("monday pack"), present it in chat as before.
 
 Order: worst first. Structure:
 

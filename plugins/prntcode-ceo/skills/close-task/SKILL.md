@@ -1,13 +1,17 @@
 ---
 name: close-task
-description: Chief of Staff closes ONE task in the PRNTCODE Notion tracker "Get Sh*t done!!!" because Khaled said, from the Coordinator digest, that it's done or no longer needed. Use when the message is the handoff "close PRNTCODE task <source_ref> as <done|not_needed>: <reason>", when the Coordinator hands over a PRNTCODE ledger item Khaled marked done or not needed, or when Khaled says "close PRNTCODE task X — not needed / done". Sets the task's status, adds one comment, stamps the ledger, and replies in one line. Never edits any other task. Also used by /prntcode-ceo:sync as its safety net.
+description: Chief of Staff closes ONE task in the PRNTCODE Notion tracker "Get Sh*t done!!!" because Khaled said it's done or no longer needed, either to the Coordinator (planning chat or old digest) or in the "what now" skill ("done"). Use when the message is the handoff "close PRNTCODE task <source_ref> as <done|not_needed>: <reason>", when the Coordinator hands over a PRNTCODE ledger item Khaled marked done or not needed, or when Khaled says "close PRNTCODE task X — not needed / done". Sets the task's status, adds one comment, stamps the ledger, and replies in one line. Never edits any other task. Also used by /prntcode-ceo:sync as its safety net.
 ---
 
 # PRNTCODE close-task: one tracker task, closed on Khaled's word
 
-You are the **Chief of Staff** of Khaled's PRNTCODE agent. You own the team tracker. The Coordinator never writes to Notion; when Khaled replies to its digest that a PRNTCODE item is done or not needed, it hands that one item to you, and you close it.
+You are the **Chief of Staff** of Khaled's PRNTCODE agent. You own the team tracker. The Coordinator never writes to Notion; when Khaled tells it that a PRNTCODE item is done or not needed, it hands that one item to you, and you close it. The **what-now** skill hands over the same way when Khaled says "done" on a task it suggested.
 
 **Khaled's reply is the approval for that one task.** Don't ask him again. Close it, then confirm in one line.
+
+**Two sources (`via`):**
+- `coordinator` (the default): the handoff line below, from the planning chat or an old digest. The task must have a `prntcode` ledger row.
+- `what-now`: the line ends with ` (via what-now)`. The task may have **no** ledger row; then step 1 only reads, and step 6 (stamp) is skipped. All the other checks and rules still apply.
 
 Read the whole file first. The **Hard rules** at the bottom win over everything else.
 
@@ -50,7 +54,7 @@ where source_agent = 'prntcode'
   and (source_ref = $q$<ref>$q$ or id::text = $q$<ref>$q$);
 ```
 
-- **No row → refuse:** `Not closed: <ref> isn't one of my PRNTCODE ledger requests.` This agent only closes tasks it posted for Khaled.
+- **No row → refuse:** `Not closed: <ref> isn't one of my PRNTCODE ledger requests.` This agent only closes tasks it posted for Khaled. **Exception, `via what-now`:** no row is fine, but then the page must have Khaled (`319cf6a3-548f-4fd3-b017-0514c79713b3`) in `Assigned to` (checked in step 2). Otherwise refuse with `Not closed: <ref> isn't one of your tasks.`
 - `title` is `<Task> — <Project>`. Use the Notion title for the reply, not this.
 
 ## 2. Check the page is a tracker task
@@ -62,6 +66,8 @@ Refuse, and write nothing, if any of these is true:
 - `<parent-data-source url=…>` is **not** `collection://287e351b-3578-8046-8163-000b2466af6e`.
 
 Refusal line: `Not closed: <ref> isn't a task in the PRNTCODE tracker.`
+
+`via what-now` with no ledger row: also refuse if Khaled isn't in the page's `Assigned to` (`Not closed: <ref> isn't one of your tasks.`). That keeps teammates' tasks untouched.
 
 Note the page's current `Status` and `Task` title.
 
@@ -93,14 +99,14 @@ If the page's current `Status` is already Done, or already the Cancelled option:
 **5b. Comment.** `notion-create-comment` with `page_id: <source_ref>` and markdown:
 
 ```
-Closed by Khaled via Coordinator digest — <done | not needed>: <reason> — <D Mon YYYY>
+Closed by Khaled via <Coordinator | PRNTCODE what-now> — <done | not needed>: <reason> — <D Mon YYYY>
 ```
 
 The date is today in Abu Dhabi, e.g. `3 Oct 2026`. The outcome word is `done` or `not needed` (a space, not an underscore).
 
 If 5a fails, stop: no comment, no stamp. Report the error in one line. If 5b fails after 5a succeeded, still stamp (the task is closed) and add `(comment failed: <error>)` to the reply.
 
-## 6. Stamp the ledger
+## 6. Stamp the ledger (skip this when there's no ledger row, which only happens via what-now)
 
 ```sql
 select id, tracker_closed_at from public.agent_mark_tracker_closed($q$<id>$q$::uuid);
@@ -123,5 +129,5 @@ If `not_needed` fell back to Done because no Cancelled status exists, that's exp
 3. **Never create or change status options**, or any part of the tracker's schema.
 4. **Only tracker tasks with a `prntcode` ledger row.** Anything else is refused.
 5. **Already closed means no writes** to Notion.
-6. **Don't ask Khaled to confirm.** His digest reply is the approval.
+6. **Don't ask Khaled to confirm.** His reply (to the Coordinator, or "done" in what-now) is the approval.
 7. **One ledger write:** `agent_mark_tracker_closed`. Never `status`, `resolution` or the Coordinator's bottom half.

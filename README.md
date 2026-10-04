@@ -2,9 +2,10 @@
 
 ![PRNTCODE CEO agent org chart: CEO router at the top, the live Chief of Staff feeding the Coordinator ledger, and seven charter-only departments](docs/org-chart.svg)
 
-Khaled's PRNTCODE agent, **v1**. The **CEO** is a thin router. The **Chief of Staff** is the one live role:
+Khaled's PRNTCODE agent, **v2.0.0** (half-week planning, 4 Oct 2026). The **CEO** is a thin router. The **Chief of Staff** is the one live role:
 
-- **Sync** (`/prntcode-ceo:sync`, daily at **06:30 Abu Dhabi**): reads the team tracker "Get Sh\*t done!!!", picks the tasks that need a block of *your* time, and posts them to your Coordinator. That happens 30 minutes before the Coordinator's 07:00 run.
+- **Refresh** (`/prntcode-ceo:refresh`, **Sun and Wed 20:00 Abu Dhabi**): reads the team tracker "Get Sh\*t done!!!", decides which of *your* tasks need your time in the coming half-week, and posts them to your Coordinator ledger. Then it shows a ≤5-line PRNTCODE pre-brief, flags your tasks with no D-Day, and on Sundays links the Monday Pack. It ends with `plan Khaled's half-week`, so the Coordinator starts planning in the same chat. It replaces the daily 06:30 sync.
+- **What now** (the `what-now` skill): in a focus block, say "what do you need from me now?", "PRNTCODE focus, what's next?" or "I have 90 minutes, what should I do?". You get the 1–3 tasks that fit your time, each with its first concrete step. Reply `done` (closes it in the tracker), `next` or `skip`.
 - **Close task** (`/prntcode-ceo:close-task`): when you tell the Coordinator's digest a PRNTCODE item is done or not needed, the Chief of Staff closes that one task in the tracker straight away. See [Closing a task from the digest](#closing-a-task-from-the-digest).
 - **Monday Pack**: the same pack as before, plus a new **Your time asks** section showing what the Coordinator did with each ask.
 
@@ -15,9 +16,10 @@ The other seven departments have a charter only: what they'll own and which exis
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"fontFamily":"Geist, Helvetica, Arial, sans-serif","primaryColor":"#360D1E","primaryTextColor":"#FFFFFF","primaryBorderColor":"#FF9395","lineColor":"#FF9395","secondaryColor":"#1B1B1B","tertiaryColor":"#FFFFFF"}}}%%
 flowchart LR
-    N[("Notion<br/>Get Sh*t done!!!")]:::src -->|"06:30 read-only"| S["Chief of Staff<br/>/prntcode-ceo:sync"]:::live
+    N[("Notion<br/>Get Sh*t done!!!")]:::src -->|"Sun + Wed 20:00 read-only"| S["Chief of Staff<br/>/prntcode-ceo:refresh"]:::live
     S -->|"upsert top half<br/>agent_withdraw"| L[("Coordinator ledger<br/>Supabase")]:::ledger
-    L -->|"07:00 places blocks"| C["Coordinator"]:::ext
+    S -->|"plan Khaled's half-week"| C["Coordinator<br/>plan"]:::ext
+    L -->|"focus blocks sized from asks"| C
     C -->|"proposes / books"| K(["Your calendar"]):::ext
     C -->|"status + decision_note"| L
     L -->|"Your time asks"| M["Monday Pack"]:::live
@@ -39,7 +41,7 @@ On a laptop, in **claude.ai**:
 4. Paste `thevault-dev/prntcode-ceo` and confirm.
 5. Turn **Sync automatically** **on**. Updates then arrive by themselves.
 6. Find **prntcode-ceo** in the list and click **Install**.
-7. Check it worked: start a new chat, type `/prntcode-ceo:` and you should see **sync**, **close-task**, **monday-pack** and **ceo**.
+7. Check it worked: start a new chat, type `/prntcode-ceo:` and you should see **refresh**, **what-now**, **close-task**, **monday-pack**, **ceo** and the retired **sync** stub.
 
 **Turn off the old Monday Pack** so two copies don't compete:
 **Customize → Skills →** find the standalone **monday-pack** → switch it **off**. The plugin's copy is the same skill plus *Your time asks*.
@@ -60,21 +62,20 @@ Both are in **Customize → Connectors**.
 
 Quick test: in a new chat, type **"sync my PRNTCODE time"**. If a connector is missing, the agent names it and writes nothing.
 
-## 3. The 06:30 scheduled task (one time)
+## 3. Scheduled tasks (v2: Sunday and Wednesday 20:00)
 
-In the **Claude desktop app** (Cowork):
+**Switch off the old one:** **Cowork → Scheduled → "PRNTCODE sync"** (`/prntcode-ceo:sync`, daily 06:30) → turn it off or delete it. Also switch off the Coordinator's **07:00** `/coordinator:daily-run` task. If either fires anyway, it only replies "retired, switch me off".
 
-1. Open **Cowork** (left sidebar).
-2. Click **Scheduled** → **New task**.
-3. **Name:** `PRNTCODE sync`
-4. **Prompt:** `/prntcode-ceo:sync`
-5. **Frequency:** **Daily**. **Time:** **06:30**.
-6. **Time zone:** make sure it's Abu Dhabi (**GMT+4**). If your computer's clock is set to another zone, convert. For example, from London in winter (GMT+0), set **02:30**.
-7. Click **Save**.
+**Create two new tasks** (Cowork → Scheduled → New task, time zone Abu Dhabi GMT+4). Both plugins must be installed. Each one runs the refresh, which ends by starting Coordinator planning in the same chat:
 
-Leave the Claude app running with the laptop awake (or set to wake). A scheduled task only runs while the app is open.
+| Name | When | Prompt |
+|---|---|---|
+| `PRNTCODE + plan (Sun)` | Weekly, Sunday 20:00 | see `BUILD_REPORT_PLANNING_V2.md` in the coordinator repo (copy exactly) |
+| `PRNTCODE + plan (Wed)` | Weekly, Wednesday 20:00 | same file |
 
-**Monday Pack schedule:** if you already have a Monday-morning task that runs the old Monday Pack, open it (**Cowork → Scheduled →** that task **→ Edit**) and change its prompt to `/prntcode-ceo:monday-pack`.
+The run stops at the Coordinator's "Anything else booked?" and waits for your reply in that task's chat.
+
+**Monday Pack:** on Sundays the refresh makes it as its own artifact and links it in one line. You can turn off any separate Monday-morning pack task, or keep it if you still want it on Monday morning.
 
 ---
 
@@ -82,12 +83,14 @@ Leave the Claude app running with the laptop awake (or set to wake). A scheduled
 
 | Say | What happens |
 |---|---|
-| `sync my PRNTCODE time` or `/prntcode-ceo:sync` | Runs the sync now and replies with the summary |
+| `refresh PRNTCODE` or `/prntcode-ceo:refresh` | Runs the half-week refresh now: pre-brief, then the Coordinator plan |
+| `what do you need from me now?` · `PRNTCODE focus, what's next?` · `I have 90 minutes, what should I do?` | 1–3 tasks that fit your time, each with a first step. Then `done` / `next` / `skip` |
+| `show details` (after a refresh) | The full Posted / Updated / Withdrawn / Skipped lists |
 | `monday pack` or `/prntcode-ceo:monday-pack` | The Monday Pack, with **Your time asks** |
 | `close PRNTCODE task <ref> as not_needed: <reason>` | Closes that one tracker task (normally sent by the Coordinator for you) |
 | `drop X` (after a sync lists a booked block you no longer need) | Say it to your **Coordinator**, which owns the calendar. The PRNTCODE agent can't remove booked blocks. |
 
-### What the sync summary looks like
+### What the v1 sync summary looked like (now `show details` after a refresh)
 
 ```
 PRNTCODE sync — Fri 2 Oct, 06:30
@@ -245,10 +248,10 @@ Guess-accuracy tracking (planned for the Auditor), reopening declined items when
 
 | Symptom | Fix |
 |---|---|
-| `/prntcode-ceo:sync` doesn't appear | Customize → Plugins → check **prntcode-ceo** is installed and on. Then start a **new** chat. |
+| `/prntcode-ceo:refresh` doesn't appear | Customize → Plugins → check **prntcode-ceo** is installed and on. Then start a **new** chat. |
 | "Notion connector missing" / "Supabase connector missing" | Section 2 above. |
 | The Monday Pack shows twice, or the old version runs | Turn off the standalone **monday-pack** skill (section 1). |
-| The 06:30 sync didn't run | The Claude app was closed or the laptop asleep. Run `sync my PRNTCODE time` by hand; it's safe to run any time. |
+| The Sun/Wed 20:00 refresh didn't run | The Claude app was closed or the laptop asleep. Say `refresh PRNTCODE` by hand; it's safe to run any time, and it still hands over to planning. |
 | A task you need time for was "No block needed" | Add a word to the task title or Notes that makes it clear you must do it ("review…", "decide…", "write…"). The next sync re-judges it. |
 
-**Version:** 1.2.0 (adds close-task from the Coordinator digest)
+**Version:** 2.0.0 (half-week refresh with handoff to Coordinator planning, what-now, Monday Pack as an artifact; the daily sync is retired). The refresh keeps every v1 sync rule below; what changed is when it runs, the 'this half-week' filter (3f-bis), and the message it ends with.

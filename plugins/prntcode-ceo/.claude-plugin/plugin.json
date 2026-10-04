@@ -1,11 +1,19 @@
 {
   "name": "prntcode-ceo",
-  "version": "1.2.0",
-  "description": "PRNTCODE CEO agent v1: daily sync of Khaled's Notion tasks into the Coordinator ledger, closing tracker tasks Khaled marks done or not needed in the digest, plus the Monday Pack with 'Your time asks'.",
+  "version": "2.0.0",
+  "description": "PRNTCODE CEO agent: a half-week refresh (Sun and Wed 20:00) that posts Khaled's PRNTCODE time needs to the Coordinator ledger, gives a 5-line pre-brief and hands over to Coordinator planning; 'what now' for focus blocks; close-task; and the Monday Pack as its own artifact.",
   "author": {
     "name": "PRNTCODE",
     "email": "thevault@prntcode.com"
   },
   "repository": "https://github.com/thevault-dev/prntcode-ceo",
-  "keywords": ["prntcode", "chief-of-staff", "coordinator", "notion", "monday-pack"]
+  "keywords": [
+    "prntcode",
+    "chief-of-staff",
+    "coordinator",
+    "notion",
+    "monday-pack",
+    "planning",
+    "focus"
+  ]
 }
