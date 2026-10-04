@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Khaled's PRNTCODE agent: a CEO router with a live Chief of Staff that feeds the Coordinator ledger and runs the Monday Pack.",
-    "version": "1.2.0"
+    "version": "2.0.0"
   },
   "plugins": [
     {
       "name": "prntcode-ceo",
       "source": "./plugins/prntcode-ceo",
-      "description": "PRNTCODE CEO agent v1: daily sync of Khaled's Notion tasks into the Coordinator ledger, closing tracker tasks Khaled marks done or not needed in the digest, plus the Monday Pack with 'Your time asks'.",
-      "version": "1.2.0",
+      "description": "PRNTCODE CEO agent: a half-week refresh (Sun and Wed 20:00) that posts Khaled's PRNTCODE time needs to the Coordinator ledger, gives a 5-line pre-brief and hands over to Coordinator planning; 'what now' for focus blocks; close-task; and the Monday Pack as its own artifact.",
+      "version": "2.0.0",
       "category": "productivity"
     }
   ]
