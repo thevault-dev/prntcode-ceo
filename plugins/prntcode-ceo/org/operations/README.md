@@ -1,4 +1,4 @@
-# Operations · ⚪ charter (no work in v1)
+# Operations · ⚪ charter (not live yet)
 
 **Will own:** the machinery that gets product out the door. That means production timelines with factories, stock and fulfilment, the Shopify catalogue's health, and pop-up logistics (fixtures, shipping, POS).
 

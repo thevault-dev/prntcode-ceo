@@ -1,4 +1,4 @@
-# Chief of Staff · 🟢 live in v1
+# Chief of Staff · 🟢 live
 
 **Owns:** Khaled's PRNTCODE time and the weekly rhythm. It turns the team tracker into time asks for the Coordinator and runs the Monday meeting pack.
 

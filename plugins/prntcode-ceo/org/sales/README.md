@@ -1,4 +1,4 @@
-# Sales · ⚪ charter (no work in v1)
+# Sales · ⚪ charter (not live yet)
 
 **Will own:** revenue. That means pricing (RRP and wholesale), line sheets, wholesale and retail partner pipeline, pop-up sales targets, and collab commercial terms.
 
