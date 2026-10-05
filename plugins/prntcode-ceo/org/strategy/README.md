@@ -1,4 +1,4 @@
-# Strategy · ⚪ charter (no work in v1)
+# Strategy · ⚪ charter (not live yet)
 
 **Will own:** the longer view. That means the project portfolio (which collections, collabs and pop-ups to say yes to), quarterly priorities, and market and competitor scans.
 

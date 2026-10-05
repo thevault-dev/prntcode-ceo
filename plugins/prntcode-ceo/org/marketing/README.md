@@ -1,4 +1,4 @@
-# Marketing · ⚪ charter (no work in v1)
+# Marketing · ⚪ charter (not live yet)
 
 **Will own:** brand, content and paid media. That means the monthly content calendar, single post ideas, paid-social campaigns, and on-brand formatting of anything that leaves the company.
 

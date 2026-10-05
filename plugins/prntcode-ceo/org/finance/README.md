@@ -1,4 +1,4 @@
-# Finance · ⚪ charter (no work in v1)
+# Finance · ⚪ charter (not live yet)
 
 **Will own:** cash, books and budgets. That means collection budgets and sign-offs, bills and expenses, cash-flow checks before big production orders, and month-end summaries.
 

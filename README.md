@@ -1,15 +1,17 @@
 # PRNTCODE CEO agent
 
-![PRNTCODE CEO agent org chart: CEO router at the top, the live Chief of Staff feeding the Coordinator ledger, and seven charter-only departments](docs/org-chart.svg)
+![PRNTCODE CEO agent org chart: CEO router at the top, the live Chief of Staff feeding the Coordinator ledger, Legal live on Anthropic's legal plugin, and six charter-only departments](docs/org-chart.svg)
 
-Khaled's PRNTCODE agent, **v2.0.0** (half-week planning, 4 Oct 2026). The **CEO** is a thin router. The **Chief of Staff** is the one live role:
+Khaled's PRNTCODE agent, **v2.1.0** (Legal goes live, 5 Oct 2026). The **CEO** is a thin router. The **Chief of Staff** is live:
 
 - **Refresh** (`/prntcode-ceo:refresh`, **Sun and Wed 20:00 Abu Dhabi**): reads the team tracker "Get Sh\*t done!!!", decides which of *your* tasks need your time in the coming half-week, and posts them to your Coordinator ledger. Then it shows a ≤5-line PRNTCODE pre-brief, flags your tasks with no D-Day, and on Sundays links the Monday Pack. It ends with `plan Khaled's half-week`, so the Coordinator starts planning in the same chat. It replaces the daily 06:30 sync.
 - **What now** (the `what-now` skill): in a focus block, say "what do you need from me now?", "PRNTCODE focus, what's next?" or "I have 90 minutes, what should I do?". You get the 1–3 tasks that fit your time, each with its first concrete step. Reply `done` (closes it in the tracker), `next` or `skip`.
 - **Close task** (`/prntcode-ceo:close-task`): when you tell the Coordinator's digest a PRNTCODE item is done or not needed, the Chief of Staff closes that one task in the tracker straight away. See [Closing a task from the digest](#closing-a-task-from-the-digest).
 - **Monday Pack**: the same pack as before, plus a new **Your time asks** section showing what the Coordinator did with each ask.
 
-The other seven departments have a charter only: what they'll own and which existing skills will move under them. See [`plugins/prntcode-ceo/org/`](plugins/prntcode-ceo/org/README.md).
+**Legal** is live too. It runs on Anthropic's **legal** plugin, installed from Anthropic's marketplace so it keeps updating. For any contract, NDA or legal question, the CEO reads PRNTCODE's playbook ([`org/legal/legal.local.md`](plugins/prntcode-ceo/org/legal/legal.local.md)) and hands it to the right `legal:` skill, so reviews use PRNTCODE's positions in place of the plugin's US-law defaults. Ask through the PRNTCODE agent ("PRNTCODE agent, review this contract"): called on its own in a chat, the plugin can't find the playbook. See [`org/legal/`](plugins/prntcode-ceo/org/legal/README.md).
+
+The other six departments have a charter only: what they'll own and which existing skills will move under them. See [`plugins/prntcode-ceo/org/`](plugins/prntcode-ceo/org/README.md).
 
 ## The loop
 
@@ -42,6 +44,7 @@ On a laptop, in **claude.ai**:
 5. Turn **Sync automatically** **on**. Updates then arrive by themselves.
 6. Find **prntcode-ceo** in the list and click **Install**.
 7. Check it worked: start a new chat, type `/prntcode-ceo:` and you should see **refresh**, **what-now**, **close-task**, **monday-pack**, **ceo** and the retired **sync** stub.
+8. For Legal, also install Anthropic's **legal** plugin from the same Plugins tab. Type `/legal:` in a new chat to check it's there.
 
 **Turn off the old Monday Pack** so two copies don't compete:
 **Customize → Skills →** find the standalone **monday-pack** → switch it **off**. The plugin's copy is the same skill plus *Your time asks*.
@@ -88,6 +91,7 @@ The run stops at the Coordinator's "Anything else booked?" and waits for your re
 | `show details` (after a refresh) | The full Posted / Updated / Withdrawn / Skipped lists |
 | `monday pack` or `/prntcode-ceo:monday-pack` | The Monday Pack, with **Your time asks** |
 | `close PRNTCODE task <ref> as not_needed: <reason>` | Closes that one tracker task (normally sent by the Coordinator for you) |
+| `PRNTCODE agent, review this contract` · `can we sign this NDA?` · `can PRNTCODE run this promotion?` | The CEO loads the Legal playbook and hands over to the right `legal:` skill. Sections still marked `_TBD_` are flagged in the first line |
 | `drop X` (after a sync lists a booked block you no longer need) | Say it to your **Coordinator**, which owns the calendar. The PRNTCODE agent can't remove booked blocks. |
 
 ### What the v1 sync summary looked like (now `show details` after a refresh)
@@ -230,19 +234,22 @@ To run it: **Supabase → coordinator → SQL Editor → New query →** paste t
 plugins/prntcode-ceo/
   .claude-plugin/plugin.json
   skills/
-    ceo/                               CEO: thin router
-    sync/                              Chief of Staff: Notion → ledger feed (+ close-task safety net)
+    ceo/                               CEO: thin router (also hands legal asks to Anthropic's legal plugin)
+    refresh/                           Chief of Staff: Sun + Wed half-week refresh → ledger (+ close-task safety net)
+    what-now/                          Chief of Staff: 1–3 tasks for a focus block
     close-task/                        Chief of Staff: close one tracker task from the digest
     monday-pack/                       Chief of Staff: Monday Pack (+ Your time asks)
+    sync/                              retired daily sync (stub)
   org/                                 one charter README per role (9)
+    legal/legal.local.md               PRNTCODE's legal playbook, read by the CEO before any legal: skill
 docs/org-chart.svg                     the chart above
 docs/coordinator-handoff.md            what the coordinator repo needs
 tests/prntcode_contract_check.sql      ledger contract self-test
 ```
 
-## Not in v1
+## Not built yet
 
-Guess-accuracy tracking (planned for the Auditor), reopening declined items when the due date moves, and real work from any department other than the Chief of Staff.
+Guess-accuracy tracking (planned for the Auditor), reopening declined items when the due date moves, Legal's own PRNTCODE skills (IP register, infringement and trademark watch, redline and renewal tracking), and real work from any department other than the Chief of Staff and Legal.
 
 ## Troubleshooting
 
@@ -252,6 +259,7 @@ Guess-accuracy tracking (planned for the Auditor), reopening declined items when
 | "Notion connector missing" / "Supabase connector missing" | Section 2 above. |
 | The Monday Pack shows twice, or the old version runs | Turn off the standalone **monday-pack** skill (section 1). |
 | The Sun/Wed 20:00 refresh didn't run | The Claude app was closed or the laptop asleep. Say `refresh PRNTCODE` by hand; it's safe to run any time, and it still hands over to planning. |
+| A legal review says it used generic or US-law standards | Either you called a `legal:` skill directly (ask through the PRNTCODE agent instead), or the section it needed is still `_TBD_` in [`legal.local.md`](plugins/prntcode-ceo/org/legal/legal.local.md). |
 | A task you need time for was "No block needed" | Add a word to the task title or Notes that makes it clear you must do it ("review…", "decide…", "write…"). The next sync re-judges it. |
 
-**Version:** 2.0.0 (half-week refresh with handoff to Coordinator planning, what-now, Monday Pack as an artifact; the daily sync is retired). The refresh keeps every v1 sync rule below; what changed is when it runs, the 'this half-week' filter (3f-bis), and the message it ends with.
+**Version:** 2.1.0 (Legal live: the CEO routes legal asks to Anthropic's legal plugin with PRNTCODE's playbook). 2.0.0 brought the half-week refresh with handoff to Coordinator planning, what-now and the Monday Pack as an artifact; the daily sync is retired. The refresh keeps every v1 sync rule below; what changed is when it runs, the 'this half-week' filter (3f-bis), and the message it ends with.

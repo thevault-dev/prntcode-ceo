@@ -1,4 +1,4 @@
-# Auditor · ⚪ charter (no work in v1)
+# Auditor · ⚪ charter (not live yet)
 
 **Will own:** checking the agent itself. Did the Chief of Staff's guesses hold up (estimated durations vs Khaled's edits and declines)? Did any department write outside its lane? Are the ledger and Notion consistent?
 
