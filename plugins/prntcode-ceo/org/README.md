@@ -1,6 +1,6 @@
 # PRNTCODE org
 
-One folder per role. The **Chief of Staff** and **Legal** are live: Legal runs on Anthropic's legal plugin with PRNTCODE's playbook. **Operations**, **Marketing** and **Sales** are partly live: each has one skill running from this repo, with the rest of its charter still to build. The others are charters only.
+One folder per role. The **Chief of Staff** and **Legal** are live: Legal runs on Anthropic's legal plugin with PRNTCODE's playbook. **Operations**, **Marketing**, **Sales** and **Strategy** are partly live: each has one skill running from this repo, with the rest of its charter still to build. The others are charters only.
 
 | Role | Status | Charter |
 |---|---|---|
@@ -11,5 +11,5 @@ One folder per role. The **Chief of Staff** and **Legal** are live: Legal runs o
 | Finance | ⚪ charter | [finance](finance/README.md) |
 | Marketing | 🟡 partly live (`prntcode-brand-formatter`) | [marketing](marketing/README.md) |
 | Sales | 🟡 partly live (`prntcode-pricing`) | [sales](sales/README.md) |
-| Strategy | ⚪ charter | [strategy](strategy/README.md) |
+| Strategy | 🟡 partly live (`collection-review`) | [strategy](strategy/README.md) |
 | Auditor | ⚪ charter | [auditor](auditor/README.md) |

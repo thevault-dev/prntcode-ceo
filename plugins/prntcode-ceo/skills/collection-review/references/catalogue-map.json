@@ -1,0 +1,55 @@
+{
+  "_about": "How collection_review.py reads PRNTCODE product titles. Edit this file, not the script, when a print, colourway or channel changes. Last reviewed 5 Oct 2026.",
+
+  "print_aliases": {
+    "Metamorphosis Lavender": "Metamorphosis",
+    "Metamorphasis Lavender": "Metamorphosis",
+    "Bloomingfield": "Blooming Field",
+    "Iconic Dot": "Iconic Dots",
+    "Iconic Dot Saffron": "Iconic Dots",
+    "Butterfly": "Butterfly"
+  },
+
+  "known_prints": [
+    "Blooming Field",
+    "Butterfly",
+    "Checkered Orchid",
+    "Iconic Dots",
+    "Metamorphosis",
+    "Coded Cheetah",
+    "Flutter Dot",
+    "Mixed Prints"
+  ],
+
+  "category_from_product_type": {
+    "ABAYA": "Abaya",
+    "RTW": "Ready-to-wear",
+    "JALABIYA": "Jalabiya",
+    "ACCESSORIES": "Accessories"
+  },
+
+  "jalabiya_marker": "MKWR",
+  "accessory_words": ["Scrunchie", "Scrunchies", "Head Scarf", "Scarf", "Twilly", "Twillies"],
+
+  "channel_groups": {
+    "Staff-entered (in person or WhatsApp)": ["Shopify Mobile for iPhone", "Shopify Mobile for Android", "Point of Sale"],
+    "Online store": ["Online Store"],
+    "Draft orders": ["Draft Orders"]
+  },
+
+  "size_words": {
+    "XS": "XS", "X-Small": "XS",
+    "S": "Small", "Small": "Small",
+    "M": "Medium", "Medium": "Medium",
+    "L": "Large", "Large": "Large",
+    "XL": "XL", "X-Large": "XL"
+  },
+  "fabric_words": ["Cotton", "Silk", "Stitched", "Fabric", "Default Title"],
+
+  "sell_through_categories": ["Ready-to-wear", "Accessories", "Jalabiya"],
+  "placeholder_stock_units": 1000,
+
+  "min_units_to_call": 5,
+  "launch_window_months": 3,
+  "rework_discount_margin": 0.05
+}

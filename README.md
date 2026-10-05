@@ -1,8 +1,8 @@
 # PRNTCODE CEO agent
 
-![PRNTCODE CEO agent org chart: CEO router at the top, the live Chief of Staff feeding the Coordinator ledger, Legal live on Anthropic's legal plugin, Operations, Marketing and Sales partly live, and three charter-only departments](docs/org-chart.svg)
+![PRNTCODE CEO agent org chart: CEO router at the top, the live Chief of Staff feeding the Coordinator ledger, Legal live on Anthropic's legal plugin, Operations, Marketing, Sales and Strategy partly live, and two charter-only departments](docs/org-chart.svg)
 
-Khaled's PRNTCODE agent, **v2.2.0** (four existing skills move into the repo, 5 Oct 2026). The **CEO** is a thin router. The **Chief of Staff** is live:
+Khaled's PRNTCODE agent, **v2.3.0** (Strategy's collection review, 5 Oct 2026). The **CEO** is a thin router. The **Chief of Staff** is live:
 
 - **Refresh** (`/prntcode-ceo:refresh`, **Sun and Wed 20:00 Abu Dhabi**): reads the team tracker "Get Sh\*t done!!!", decides which of *your* tasks need your time in the coming half-week, and posts them to your Coordinator ledger. Then it shows a ≤5-line PRNTCODE pre-brief, flags your tasks with no D-Day, and on Sundays links the Monday Pack. It ends with `plan Khaled's half-week`, so the Coordinator starts planning in the same chat. It replaces the daily 06:30 sync.
 - **What now** (the `what-now` skill): in a focus block, say "what do you need from me now?", "PRNTCODE focus, what's next?" or "I have 90 minutes, what should I do?". You get the 1–3 tasks that fit your time, each with its first concrete step. Reply `done` (closes it in the tracker), `next` or `skip`.
@@ -12,13 +12,14 @@ Khaled's PRNTCODE agent, **v2.2.0** (four existing skills move into the repo, 5 
 
 **Legal** is live too. It runs on Anthropic's **legal** plugin, installed from Anthropic's marketplace so it keeps updating. For any contract, NDA or legal question, the CEO reads PRNTCODE's playbook ([`org/legal/legal.local.md`](plugins/prntcode-ceo/org/legal/legal.local.md)) and hands it to the right `legal:` skill, so reviews use PRNTCODE's positions in place of the plugin's US-law defaults. Ask through the PRNTCODE agent ("PRNTCODE agent, review this contract"): called on its own in a chat, the plugin can't find the playbook. See [`org/legal/`](plugins/prntcode-ceo/org/legal/README.md).
 
-**Operations, Marketing and Sales are partly live**: each runs one skill from this repo, and the rest of its charter is still to build.
+**Operations, Marketing, Sales and Strategy are partly live**: each runs one skill from this repo, and the rest of its charter is still to build.
 
 - **Operations** · `prntcode-catalogue-review`: the monthly Shopify tag, variant and collection audit, and the Lumi's Favs rotation. Writes to Shopify only after you approve.
 - **Marketing** · `prntcode-brand-formatter`: puts anything that leaves the company into the PRNTCODE brand.
 - **Sales** · `prntcode-pricing`: prices a collection from its costing sheet, with competitor benchmarks and a branded Excel model.
+- **Strategy** · `collection-review`: what sold in past collections (print, silhouette, size, colourway, channel, pace and discount) and what the next collection should repeat, rework or retire. Read-only on Shopify analytics.
 
-Strategy, Finance and the Auditor have a charter only. See [`plugins/prntcode-ceo/org/`](plugins/prntcode-ceo/org/README.md).
+Finance and the Auditor have a charter only. See [`plugins/prntcode-ceo/org/`](plugins/prntcode-ceo/org/README.md).
 
 ## The loop
 
@@ -50,7 +51,7 @@ On a laptop, in **claude.ai**:
 4. Paste `thevault-dev/prntcode-ceo` and confirm.
 5. Turn **Sync automatically** **on**. Updates then arrive by themselves.
 6. Find **prntcode-ceo** in the list and click **Install**.
-7. Check it worked: start a new chat, type `/prntcode-ceo:` and you should see **refresh**, **what-now**, **close-task**, **monday-pack**, **meeting-tasks**, **prntcode-catalogue-review**, **prntcode-brand-formatter**, **prntcode-pricing**, **ceo** and the retired **sync** stub.
+7. Check it worked: start a new chat, type `/prntcode-ceo:` and you should see **refresh**, **what-now**, **close-task**, **monday-pack**, **meeting-tasks**, **prntcode-catalogue-review**, **prntcode-brand-formatter**, **prntcode-pricing**, **collection-review**, **ceo** and the retired **sync** stub.
 8. For Legal, also install Anthropic's **legal** plugin from the same Plugins tab. Type `/legal:` in a new chat to check it's there.
 
 **Turn off the old standalone copies** so two versions don't compete. In **Customize → Skills** (or **Customize → Plugins**, wherever each one shows up), switch these **off**:
@@ -105,6 +106,7 @@ The run stops at the Coordinator's "Anything else booked?" and waits for your re
 | `run the tag review` · `catalogue review` · `pick Lumi's favourites` | Operations' monthly catalogue audit; Shopify changes only after your yes |
 | `brand this` · `put this in PRNTCODE format` | Marketing's brand formatter |
 | `price this collection` + a costing sheet | Sales' pricing model: RRP, wholesale, margins, benchmarks, branded Excel |
+| `collection review` · `what sold in past collections?` · `check Wildflower against past sales` | Strategy's collection review: a report file plus a five-line summary with what to repeat, rework and retire. Reads Shopify only |
 | `PRNTCODE agent, review this contract` · `can we sign this NDA?` · `can PRNTCODE run this promotion?` | The CEO loads the Legal playbook and hands over to the right `legal:` skill. Sections still marked `_TBD_` are flagged in the first line |
 | `drop X` (after a sync lists a booked block you no longer need) | Say it to your **Coordinator**, which owns the calendar. The PRNTCODE agent can't remove booked blocks. |
 
