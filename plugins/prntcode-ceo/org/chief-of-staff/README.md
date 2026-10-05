@@ -7,7 +7,8 @@
 - [`what-now`](../../skills/what-now/SKILL.md): in a focus block, returns the 1–3 tasks that fit the time he has, each with its first concrete step. "done" closes the task via close-task.
 - [`close-task`](../../skills/close-task/SKILL.md): closes one tracker task Khaled marked done or not needed.
 - [`monday-pack`](../../skills/monday-pack/SKILL.md): the Monday Meeting Pack, ported unchanged, plus **Your time asks**.
+- [`meeting-tasks`](../../skills/meeting-tasks/SKILL.md): turns Fellow meeting action items into tasks in "Get Sh*t done!!!" for the whole PRNTCODE team. Nothing is written until Khaled approves the confirmation table.
 
-**Will take on later:** `meeting-tasks` (Fellow notes → tracker), and guess-accuracy tracking (compare estimated durations with what Khaled actually edits or declines).
+**Will take on later:** pipeline cadence (check the Game Plan pipeline against Strategy's cadence and flag a gap while there's still lead time). Guess-accuracy tracking moves to the Auditor.
 
-**Writes:** the ledger top half (upsert) and `agent_withdraw` only. Notion only after an approved Monday Pack proposal. Never calendars.
+**Writes:** the ledger top half (upsert) and `agent_withdraw` only. Notion only after an approved Monday Pack proposal or an approved meeting-tasks table, or when close-task closes one task Khaled marked done. Never calendars.

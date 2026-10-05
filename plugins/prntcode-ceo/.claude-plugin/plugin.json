@@ -1,7 +1,7 @@
 {
   "name": "prntcode-ceo",
-  "version": "2.1.0",
-  "description": "PRNTCODE CEO agent: a half-week refresh (Sun and Wed 20:00) that posts Khaled's PRNTCODE time needs to the Coordinator ledger, gives a 5-line pre-brief and hands over to Coordinator planning; 'what now' for focus blocks; close-task; the Monday Pack as its own artifact; and Legal, routed to Anthropic's legal plugin with PRNTCODE's playbook.",
+  "version": "2.2.0",
+  "description": "PRNTCODE CEO agent: a half-week refresh (Sun and Wed 20:00) that posts Khaled's PRNTCODE time needs to the Coordinator ledger and hands over to Coordinator planning; 'what now' for focus blocks; close-task; meeting-tasks; the Monday Pack; Legal on Anthropic's legal plugin with PRNTCODE's playbook; and the first department skills: catalogue review (Operations), brand formatter (Marketing) and pricing (Sales).",
   "author": {
     "name": "PRNTCODE",
     "email": "thevault@prntcode.com"
@@ -15,6 +15,10 @@
     "monday-pack",
     "planning",
     "focus",
-    "legal"
+    "legal",
+    "shopify",
+    "pricing",
+    "brand",
+    "fellow"
   ]
 }
