@@ -17,7 +17,7 @@ Khaled's PRNTCODE agent, **v2.3.0** (Strategy's collection review, 5 Oct 2026). 
 - **Operations** · `prntcode-catalogue-review`: the monthly Shopify tag, variant and collection audit, and the Lumi's Favs rotation. Writes to Shopify only after you approve.
 - **Marketing** · `prntcode-brand-formatter`: puts anything that leaves the company into the PRNTCODE brand.
 - **Sales** · `prntcode-pricing`: prices a collection from its costing sheet, with competitor benchmarks and a branded Excel model.
-- **Strategy** · `collection-review`: the starting point of the Collection Design Process. Prior-year Shopify sales become the stage 00 input for your collection budget, plus the stage 02 input for the Track A commercial core. Read-only on Shopify analytics.
+- **Strategy** · `collection-review`: the Track A line plan for the next collection, as counts not designs (how many tops, bottoms, dresses and abayas, units, sizes, print slots), with the reason for each line, planned for in-house production. Read-only on Shopify analytics.
 
 Finance and the Auditor have a charter only. See [`plugins/prntcode-ceo/org/`](plugins/prntcode-ceo/org/README.md).
 
@@ -106,7 +106,7 @@ The run stops at the Coordinator's "Anything else booked?" and waits for your re
 | `run the tag review` · `catalogue review` · `pick Lumi's favourites` | Operations' monthly catalogue audit; Shopify changes only after your yes |
 | `brand this` · `put this in PRNTCODE format` | Marketing's brand formatter |
 | `price this collection` + a costing sheet | Sales' pricing model: RRP, wholesale, margins, benchmarks, branded Excel |
-| `collection review` · `stage 00 pack` · `check Wildflower against past sales` | Strategy's collection review: the stage 00 starting point as a report file (Part 1 for your budget, Part 2 for stage 02), plus a five-line summary. Reads Shopify only |
+| `collection review` · `line plan for Wildflower` · `what does Track A need?` | Strategy's Track A line plan: what to make, how many and why, with the evidence and stage 00 inputs in the file. Reads Shopify only |
 | `PRNTCODE agent, review this contract` · `can we sign this NDA?` · `can PRNTCODE run this promotion?` | The CEO loads the Legal playbook and hands over to the right `legal:` skill. Sections still marked `_TBD_` are flagged in the first line |
 | `drop X` (after a sync lists a booked block you no longer need) | Say it to your **Coordinator**, which owns the calendar. The PRNTCODE agent can't remove booked blocks. |
 

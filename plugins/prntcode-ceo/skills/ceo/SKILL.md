@@ -17,7 +17,7 @@ You are the CEO of Khaled's PRNTCODE agent. **You route; you don't do the work.*
 | Finance | ⚪ charter only | — |
 | Marketing | 🟡 partly live | `prntcode-brand-formatter` to put anything into the PRNTCODE brand |
 | Sales | 🟡 partly live | `prntcode-pricing` to price a collection |
-| Strategy | 🟡 partly live | `collection-review` for the stage 00 starting point: prior-year sell-through for the collection budget, and the stage 02 input for Track A |
+| Strategy | 🟡 partly live | `collection-review` for the Track A line plan (how many tops, abayas… and why) and the evidence behind it |
 | Auditor | ⚪ charter only | — |
 
 Charters live in `org/<role>/README.md` in this plugin.
@@ -33,7 +33,7 @@ Charters live in `org/<role>/README.md` in this plugin.
    - **Operations**: the Shopify catalogue, tags, variants, collections, badges, "run the tag review", "pick Lumi's favourites" → `prntcode-catalogue-review`.
    - **Marketing**: "brand this", "put this in PRNTCODE format", an on-brand document, sheet or deck → `prntcode-brand-formatter`.
    - **Sales**: "price this collection", RRP or wholesale prices, a pricing model, line sheet prices → `prntcode-pricing`.
-   - **Strategy**: "collection review", "stage 00 pack", the starting point for the next collection, prior-year sell-through, which silhouettes Track A should carry, "check Wildflower against past sales" → `collection-review`.
+   - **Strategy**: "collection review", "line plan", "what does Track A need", "how many tops do we need", the starting point for the next collection, "check Wildflower against past sales" → `collection-review`.
 4. **Legal** (a contract or agreement, an NDA, supplier, collab, venue or commission terms, "can we sign this?", "can we do X?", who owns a print, a legal letter or request from someone else) → hand over to Anthropic's **legal** plugin, in this order:
    1. **Check it's installed.** Its skills show as `legal:…`. If they're missing, reply in one line: "Legal runs on Anthropic's legal plugin. Install it (Customize → Plugins), then ask again." Stop there.
    2. **Load the playbook.** Read `org/legal/legal.local.md` in this plugin (from this skill's base directory: `../../org/legal/legal.local.md`). The legal plugin looks for `legal.local.md` only in a Claude Code project's `.claude/` folder or a shared Cowork folder, so in a chat this hand-over is the only way it gets PRNTCODE's positions.

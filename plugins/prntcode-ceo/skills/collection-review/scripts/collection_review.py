@@ -173,6 +173,21 @@ def add(a, r):
     a["net"] += num(r.get("net_sales"))
 
 
+def silhouette_call(units, disc, cat_disc, returns, months_on, net, fair):
+    """The Track A call for one silhouette (rules in SKILL.md, step 4). Shared with line_plan.py."""
+    if months_on is not None and months_on < MAP["launch_window_months"]:
+        return "Too new to call"
+    if units < MAP["min_units_to_call"]:
+        return "Drop from Track A (could return as Track B)" if months_on is not None else "Too few to call"
+    if disc > cat_disc + MAP["rework_discount_margin"]:
+        return "Carry only if reworked: sold on discount"
+    if returns > MAP["rework_returns_rate"]:
+        return "Carry only if reworked: high returns"
+    if net >= fair:
+        return "Carry into Track A"
+    return "Watch"
+
+
 # ---------- main ----------
 
 def main():
@@ -379,8 +394,8 @@ def main():
     result["headline"] = {"period": period, "net_sales": tot_net, "named_net": named_net, "unnamed_net": un_net, "unnamed_units": un_units}
 
     # ---------- PART 2 ----------
-    out.append("\n## Part 2 · Stage 02 inputs (factory silhouette selection and commercial core, Track A)")
-    out.append("_Prior sell-through, directional. For choosing blocks and pairing prints to them. Print allocation itself is Hessa's, at stage 01._")
+    out.append("\n## Part 2 · Stage 02 inputs (silhouette selection and commercial core, Track A)")
+    out.append("_Prior sell-through, directional. For choosing which proven patterns Track A carries and pairing prints to them. Print allocation itself is Hessa's, at stage 01._")
 
     out.append("\n### 2.1 Silhouettes: what to carry into Track A")
     rows, calls = [], []
@@ -391,24 +406,13 @@ def main():
             v = by_sil[k]
             disc = pct(v["disc"], v["gross"])
             mo = months_on(c, sil=k[1])
-            if mo is not None and mo < W:
-                call = "Too new to call"
-            elif v["units"] < minu:
-                call = "Drop from Track A (could return as Track B)" if mo is not None else "Too few to call"
-            elif disc > cat_disc[c] + margin:
-                call = "Carry only if reworked: sold on discount"
-            elif pct(v["returned"], v["ordered"]) > ret_max:
-                call = "Carry only if reworked: high returns"
-            elif v["net"] >= fair:
-                call = "Carry into Track A"
-            else:
-                call = "Watch"
+            call = silhouette_call(v["units"], disc, cat_disc[c], pct(v["returned"], v["ordered"]), mo, v["net"], fair)
             ret = pct(v["returned"], v["ordered"])
             rows.append([c, k[1], f"{v['units']:.0f}", aed(v["net"]), p100(disc), p100(ret), st_cell(c, stock_sil, k), call])
             calls.append({"category": c, "silhouette": k[1], "units": v["units"], "discount": disc, "returns": ret, "call": call})
     out.append(f"_Rules: fewer than {W} months on sale = too new; under {minu} units = drop from Track A; discount over {p100(margin)} points above its category, or returns over {p100(ret_max)}, = rework; at or above its fair share of category sales = carry. Overrule any call with a reason._")
     out.append(table(["Category", "Silhouette", "Units", "Net AED", "Discount", "Returns", "Sell-through", "Call"], rows))
-    out.append("_Returns = units returned ÷ units ordered. A high rate on a block-based silhouette is a fit or quality question for Deepwear at stage 02._")
+    out.append("_Returns = units returned ÷ units ordered. A high rate is a fit or make question for the pattern before it goes back into production._")
     result["silhouettes"] = calls
 
     out.append("\n### 2.2 Print × category pairing")

@@ -1,164 +1,195 @@
 ---
 name: collection-review
-description: PRNTCODE Strategy's collection review, the starting point of the Collection Design Process (PC-OPS-CDP-09). Reads prior-year Shopify sales and builds the stage 00 sell-through input for Khaled's collection budget (sell-through by print and category, what the year absorbed, stock still on hand) plus the directional stage 02 input for the Track A commercial core (silhouettes to carry, print × category pairings, price tiers, size run). Use when Khaled says "collection review", "run the collection review", "stage 00 pack", "starting point for the next collection", "prior-year sell-through", "what sold last year", "which silhouettes should Track A carry", "check Wildflower against past sales", or asks for the sales input to a collection budget. Read-only. Never feeds stage 01 (trend research and the brand track run without sales data). Not the catalogue (tag) review, which is Operations' prntcode-catalogue-review.
+description: PRNTCODE Strategy's collection review. Ends in the Track A line plan for the next collection, as counts not designs (e.g. "10 tops, 5 of them long-sleeve"), with units, first run and restock, size split, last year's price, carry-over and new print slots, and the reason for every line, built from prior-year Shopify sales and planned for in-house production. Also gives the evidence behind it and the stage 00 budget inputs. Use when Khaled says "collection review", "line plan", "what does Track A need", "how many tops / abayas do we need", "plan the Track A collection", "starting point for the next collection", "stage 00 pack", "check Wildflower against past sales", or asks what the next collection should be made of. Read-only. Never plans Track B (the brand track runs without sales data). Not the catalogue (tag) review, which is Operations' prntcode-catalogue-review.
 ---
 
 # PRNTCODE collection review (Strategy)
 
+## The end goal
+
+**The full Track A line plan for a collection, and why.** Counts, not designs:
+
+```
+## What Track A needs
+- 9 abayas (8 reversible abayas, 1 abaya) · 184 units
+- 10 tops (5 long sleeve tops, 4 smocked tops, 1 halter top) · 103 units
+- 8 bottoms (4 long skirts, 3 pants, 1 midi skirt) · 78 units
+- 2 dresses (2 long dresses) · 21 units
+- Total: 32 styles, 408 units. First run 290 to make, 118 held back to restock what sells.
+- Track B reserve: about 220 more units, planned by Hessa and the design seat without sales data.
+```
+
+Then one line per silhouette: styles, units (first run + restock), first-run sizes, last year's price, print slots (proven carry-over pairings vs new slots for Hessa) and **why** (the call and the numbers behind it). After that comes what was left out of Track A and why, and how the numbers were reached.
+
+Everything else in this skill is the evidence for that plan.
+
 ## Where this sits in the Collection Design Process
 
-The process doc is **🧵 Collection Design Process** (PC-OPS-CDP-09) in Notion: `https://app.notion.com/p/3c5e351b3578817d97f6e7ba21561ad7`. This review supplies its sales inputs. Until the operator ledger exists, it also stands in for the sales half of the stage 19 year-end review pack, which "feeds directly into the next collection budget at stage 00".
+The process doc is **🧵 Collection Design Process** (PC-OPS-CDP-09) in Notion: `https://app.notion.com/p/3c5e351b3578817d97f6e7ba21561ad7`.
 
-| Stage | What the process asks for | Where it is in this review |
-|---|---|---|
-| **00 · Envelope and collection budget** (Khaled, GATE) | Prior-year sell-through by print and category, *directional only*; Archive stock still carrying book value | **Part 1**: the starting point |
-| 01 · Trend research and brand track (Hessa + design seat) | **Sell-through data explicitly excluded** | Nothing. Never send this review into stage 01 |
-| **02 · Factory silhouette selection and commercial core** (design seat + Hessa, GATE) | Prior sell-through, caveated as directional; established price tier structure | **Part 2**, handed over at stage 02, after Hessa has approved Track B direction |
+**Production and sampling are now in-house** (the tailors and embroiderers; see the Atelier brief). The process doc still describes Deepwear blocks, factory sampling, MOQs and freight. Until it's revised, this skill assumes:
 
-Rules from the process that this skill follows:
+- **Track A is built on proven silhouettes**: PRNTCODE's own patterns that have already sold, not a factory block catalogue.
+- **No minimum orders.** So the buy is a **first run plus a restock reserve**, not one bulk order. Restock what sells, during the season.
+- **Capacity limits the first run**, not MOQs or freight. The Atelier will know the team's weekly output; until then capacity isn't checked unless Khaled gives a number.
+- **The main lumpy cost is materials** (fabric and trims), plus the team's time.
 
-- **Directional, never decisive.** Every table carries that caveat. Khaled signs the budget; Hessa and the design seat select blocks. The review informs; it doesn't decide.
-- **Two scoreboards, never averaged.** Track A is judged on sell-through and gross margin; Track B on editorial pickup, collaboration interest and brand search lift. Past Shopify listings aren't tagged by track, so the review reports sales by print, category and silhouette and **never assigns past pieces to a track or blends the two into one number**. A silhouette that fails Track A's test can still return as a Track B piece; say so rather than "retire".
-- **Prints are allocated, not chosen by sales.** Print allocation is Hessa's at stage 01, from the print workstream. The review shows which print sold on which category as pairing evidence for stage 02; it never recommends dropping or keeping a print.
+How the plan feeds the process:
+
+| Stage | Use |
+|---|---|
+| **00 · Collection budget** (Khaled, GATE) | Track A units → materials and labour cost → the budget. The evidence tables give prior-year sell-through by print and category, as the process asks |
+| 01 · Trend research and brand track | **Nothing.** Track B is designed without sales data. The plan only reserves its share of units |
+| **02 · Silhouette selection and commercial core** | The line plan **is** the draft Track A style list: which silhouettes, how many styles, price tier and print slots |
+| **11 · Buy commitment** | First run, restock reserve and size curve per silhouette |
+
+Rules this skill keeps:
+
+- **Directional.** Khaled signs the budget and Hessa signs the range. The plan is a starting point to change, never a decision.
+- **Two scoreboards.** Track A only. Never plan Track B from sales, never assign past pieces to a track, never average the tracks.
+- **Prints are Hessa's.** The plan names print *slots*. A carry-over slot names a print that already sold well on that silhouette, and it holds only if Hessa keeps that print in the year's allocation. The skill never recommends dropping a print.
 
 **Read-only.** It never writes to Shopify, Notion, the ledger or a calendar.
 
-Khaled often reads on his phone. Lead with the answer, keep tables narrow, and put the detail in the file.
-
 ## Step 1: Scope
 
-Settle these without asking unless the request is truly unclear:
+Settle these from the request, the Game Plan tracker (if Notion is connected) and the defaults. Ask only if the collection or its launch month is truly unknown.
 
-- **Period.** Default **prior year**: the 12 complete months before the current month (on 6 Oct 2026: `SINCE 2025-10-01 UNTIL 2026-09-30`). Use all history (`SINCE 2023-01-01 UNTIL today`; the store's first sale is June 2025) only if Khaled asks, or to give a launch-and-pace view for pieces that started before the prior year.
-- **Focus collection** (optional), e.g. "Wildflower". Look it up in the Game Plan projects tracker if Notion is connected, to see which stage it's at. If it's past buy commitment (stage 11), Part 1 feeds the *next* collection's budget, and Part 2 matters for this one only through pre-sale depth (stage 14), and only if Deepwear's PO adjustment window allows (an open item in §10 of the process doc). Say which applies in the report.
+| Setting | Default | Flag |
+|---|---|---|
+| Collection name | "the next collection" | `--collection "Wildflower SS27"` |
+| Launch month | the project's D-Day in the Game Plan; otherwise next month | `--launch 2027-04` |
+| Selling window | 6 months | `--months 6` |
+| Growth on last year | 0% (Khaled's call) | `--growth 0.1` |
+| Team capacity before launch | not checked | `--capacity 300` |
+| Focus (existing listings to count as already made) | the collection's name, e.g. "Wildflower" | `--focus Wildflower` |
+| Sales period to learn from | the 12 complete months before this month | in the queries |
+
+Other settings (target sell-through 80%, first run 70%, Track A 65% of the collection, units per style, carry-over cap 50%) live under `plan` in `references/catalogue-map.json`. Say in the report which defaults were used.
+
+**Seasonality matters.** The plan uses the same months last year as the selling window wherever there's history, so a window must have been sold through last year to be planned well. If the selling window starts more than 12 months after the last month of data, widen the query period.
 
 ## Step 2: Pull the data (five ShopifyQL queries)
 
 Use the Shopify connector's `run-analytics-query` tool (load it with ToolSearch if it's deferred). Run the queries **one at a time, about 30 seconds apart**. The analytics API rate-limits fast: if a query returns "Rate limited", wait about 75 seconds and retry it once. Don't fire them in parallel; a parallel batch fails together.
 
-Replace `<SINCE>` and `<UNTIL>` with the period from step 1. Save each result **exactly as the tool returned it** (the JSON object with `columns` and `rows`) to a file in a working folder, e.g. `collection-review-data/`. The file names matter: the script looks for them.
+Replace `<SINCE>` and `<UNTIL>` with the period (on 6 Oct 2026: `2025-10-01` and `2026-09-30`). Save each result **exactly as the tool returned it** (the JSON object with `columns` and `rows`) to a working folder, e.g. `collection-review-data/`. The file names matter.
 
-| # | File | Query |
-|---|---|---|
-| 1 | `products.json` | `FROM sales SHOW orders, quantity_ordered, quantity_returned, net_items_sold, gross_sales, discounts, sales_reversals, net_sales GROUP BY product_title, product_type SINCE <SINCE> UNTIL <UNTIL> ORDER BY net_sales DESC LIMIT 1000` |
-| 2 | `channels.json` | `FROM sales SHOW net_items_sold, gross_sales, discounts, net_sales GROUP BY product_title, sales_channel SINCE <SINCE> UNTIL <UNTIL> ORDER BY net_sales DESC LIMIT 1000` |
-| 3 | `variants.json` | `FROM sales SHOW net_items_sold, net_sales GROUP BY product_title, product_type, product_variant_title SINCE <SINCE> UNTIL <UNTIL> ORDER BY net_items_sold DESC LIMIT 1000` |
-| 4 | `monthly.json` | `FROM sales SHOW net_items_sold, gross_sales, discounts GROUP BY product_title TIMESERIES month SINCE <SINCE> UNTIL <UNTIL> LIMIT 1000` |
-| 5 | `inventory.json` | `FROM inventory SHOW ending_inventory_units, inventory_units_sold, sell_through_rate GROUP BY product_title SINCE <SINCE> UNTIL <UNTIL> ORDER BY inventory_units_sold DESC LIMIT 1000` |
+| # | File | Query | Needed for |
+|---|---|---|---|
+| 1 | `products.json` | `FROM sales SHOW orders, quantity_ordered, quantity_returned, net_items_sold, gross_sales, discounts, sales_reversals, net_sales GROUP BY product_title, product_type SINCE <SINCE> UNTIL <UNTIL> ORDER BY net_sales DESC LIMIT 1000` | everything (required) |
+| 2 | `channels.json` | `FROM sales SHOW net_items_sold, gross_sales, discounts, net_sales GROUP BY product_title, sales_channel SINCE <SINCE> UNTIL <UNTIL> ORDER BY net_sales DESC LIMIT 1000` | evidence |
+| 3 | `variants.json` | `FROM sales SHOW net_items_sold, net_sales GROUP BY product_title, product_type, product_variant_title SINCE <SINCE> UNTIL <UNTIL> ORDER BY net_items_sold DESC LIMIT 1000` | size split |
+| 4 | `monthly.json` | `FROM sales SHOW net_items_sold, gross_sales, discounts GROUP BY product_title TIMESERIES month SINCE <SINCE> UNTIL <UNTIL> LIMIT 1000` | the line plan (required) |
+| 5 | `inventory.json` | `FROM inventory SHOW ending_inventory_units, inventory_units_sold, sell_through_rate GROUP BY product_title SINCE <SINCE> UNTIL <UNTIL> ORDER BY inventory_units_sold DESC LIMIT 1000` | sell-through, stock already made |
 
-Query 1 is required. If any other query keeps failing after its retry, carry on without it: the script skips that section and says so, and the report names what's missing.
+If query 2, 3 or 5 keeps failing after its retry, carry on: the scripts skip what they can't build and say so. Without query 4 there's no line plan; say so and deliver the evidence only.
 
 The tool also renders each result as a chart in the chat. Don't restate those numbers in the reply.
 
-## Step 3: Run the script
+## Step 3: Run the two scripts
 
 ```
-python3 <this skill's folder>/scripts/collection_review.py collection-review-data --period "Oct 2025 – Sep 2026" --focus "Wildflower" --json collection-review-data/summary.json
+python3 <skill>/scripts/line_plan.py collection-review-data --collection "Wildflower SS27" --launch 2027-04 --focus Wildflower --json collection-review-data/plan.json
+python3 <skill>/scripts/collection_review.py collection-review-data --period "Oct 2025 – Sep 2026" --focus Wildflower
 ```
 
-Leave out `--focus` if no collection was named. The script reads `references/catalogue-map.json` for how titles map to prints, categories and channels, and for every threshold. It prints the report's tables in process order:
+- **`line_plan.py`** writes the end goal: what Track A needs, the line and why, what's not in Track A and why, and how the numbers were reached.
+- **`collection_review.py`** writes the evidence: Part 1 for stage 00 (sell-through by print and category, what the year absorbed, stock on hand, sales not tied to a product), Part 2 for stage 02 (silhouette calls, print × category pairing, price tiers, size run) and an appendix (channels, launch and pace).
 
-- **Part 1 · Stage 00**: 1.1 sell-through by print and category · 1.2 what the year absorbed, by category (the demand baseline) · 1.3 stock still on hand · 1.4 sales not tied to a product
-- **Part 2 · Stage 02**: 2.1 silhouettes, with a call each · 2.2 print × category pairing · 2.3 price tier coverage · 2.4 size run, as a ratio out of 10, and abaya colourways
-- **Appendix**: where it sells · launch and pace · the focus collection's listings
+**If you can't run code**, build the same tables by hand from the five results, following "How the plan is built" and "How titles are read". It's slower, but the method is the same.
 
-**If you can't run code** in this session, build the same tables by hand from the five results, following "How titles are read" and step 4. It's slower but the method is the same.
+### How the plan is built
 
-### How titles are read
+1. **Expected sales per category in the window**: units sold in the same months last year. Months with no history (e.g. before ready-to-wear launched) use the last-6-months rate.
+2. **Units to make** = expected sales × (1 + growth) ÷ target sell-through.
+3. **Silhouettes** get those units in proportion to last year's units, by their Track A call: *carry* and *too new* at full weight, *watch* and *rework* at half weight, *drop* at zero. A silhouette whose share is under half a style is folded into the rest.
+4. **Styles** = units ÷ units per style (20 per abaya, 10 per ready-to-wear piece, 6 per jalabiya, 10 per accessory).
+5. **Print slots**: proven pairings on that silhouette (5+ units, normal discount and returns), ranked by pace, fill up to half the styles. The rest are new slots.
+6. **First run** = 70% of units, less anything already made for the collection. The rest is the restock reserve. First-run sizes follow the category's size curve.
+7. **Capacity**: if given, the first run is scaled to fit it.
+8. **Track B** = the remaining 35% of the collection's units, reserved and not planned.
 
-The script groups listings, not raw titles, so relisted and renamed versions count together:
+A category with too few expected sales in the window is left out, and the plan says when it does sell. For example, jalabiyas sold only in February and March 2026 (Ramadan and Eid), so they belong in their own drop, not an April collection.
 
-- **Two naming eras.** Until April 2026 abayas were titled `The <Print> - Reversible Abaya` (or just `The <Print>`). From April 2026 they're `The Reversible Abaya in <Print>` / `The Abaya in <Print>`. Same product, relisted. Merge them by print and silhouette; never report them as two products.
-- **Print** = the text after the last ` in `, or before ` - ` in old titles. Aliases in `catalogue-map.json` fold colourway names into their print (`Metamorphosis Lavender` → Metamorphosis).
-- **Category** = `product_type` (ABAYA, RTW, Jalabiya, Accessories). Old Butterfly listings have a blank type, so the title decides: anything with "Abaya" is an abaya, anything with `MKWR` is a jalabiya, scrunchies, scarves and twillies are accessories.
-- **Silhouette**: abayas are *Reversible Abaya* or *Abaya*; ready-to-wear is the text before ` in ` (Long Skirt, Smocked Top…). These are the shapes Deepwear's blocks will be chosen against at stage 02.
-- **New print names need no code change.** `The Reversible Abaya in Burlwood Wildflower` reads as print "Burlwood Wildflower" automatically. Add an alias only when a name should fold into an existing print.
-
-## Step 4: Read the tables
-
-The script's calls for each silhouette (2.1) follow these rules. They're a starting point: overrule any of them with a one-line reason (a block that's new, a silhouette held back by stock, a one-off bulk order).
+### The silhouette calls
 
 | Call | Rule |
 |---|---|
 | **Too new to call** | on sale for fewer than 3 months |
 | **Drop from Track A (could return as Track B)** | fewer than 5 units after 3+ months on sale |
 | **Carry only if reworked: sold on discount** | discount more than 5 points above its category's average |
-| **Carry only if reworked: high returns** | over 25% of units ordered came back: a fit or quality question for Deepwear's block |
-| **Carry into Track A** | at or above its fair share of its category's sales (category sales ÷ number of silhouettes) |
+| **Carry only if reworked: high returns** | over 25% of units ordered came back: fix the pattern or make before it's remade |
+| **Carry into Track A** | at or above its fair share of its category's sales |
 | **Watch** | sells, below its share, normal discount and returns |
 
-Thresholds live in `catalogue-map.json` (`min_units_to_call`, `launch_window_months`, `rework_discount_margin`, `rework_returns_rate`, `price_bands_aed`).
+### How titles are read
 
-Then read across the tables for what rules can't see:
+- **Two naming eras.** Until April 2026 abayas were titled `The <Print> - Reversible Abaya` (or just `The <Print>`). From April 2026 they're `The Reversible Abaya in <Print>` / `The Abaya in <Print>`. Same product, relisted, and merged by print and silhouette.
+- **Print** = the text after the last ` in `, or before ` - ` in old titles. Aliases in `catalogue-map.json` fold colourway names into their print (`Metamorphosis Lavender` → Metamorphosis).
+- **Category** = `product_type`. Old Butterfly listings have a blank type, so the title decides: "Abaya" → abaya, `MKWR` → jalabiya, scrunchies, scarves and twillies → accessories.
+- **Silhouette**: abayas are *Reversible Abaya* or *Abaya*; ready-to-wear is the text before ` in `. **Families** (tops, bottoms, dresses…) are set under `plan.families`. Add a new silhouette there when one appears.
+- **New print names need no code change.**
 
-- **Sell-through vs units a month.** The process defines sell-through as units sold ÷ units bought. Shopify only knows stock on hand, so the review uses sold ÷ (sold + still in stock), and only where stock counts are real (ready-to-wear, jalabiyas, accessories). Abaya stock isn't reliable (see "Known data problems"), so abayas show units a month. Say this every time; don't present abaya pace as sell-through.
-- **Demand baseline (1.2).** Units a month over the year and over the last 6 months, per category. This is what each stage 00 scenario's unit buy should be checked against. Ready-to-wear launched mid-year, so use its last-6-months rate.
-- **Discount is the full-price proxy.** Shopify can't say which units sold at full price, so the discount share stands in for it.
-- **No margin.** Shopify holds no product costs (`gross_profit` reads zero), so Track A's margin half comes from the live costing sheet (stage 10), not from this review. Say so.
-- **Pairing (2.2) is evidence, not a verdict.** "Butterfly: 49 abayas, 1 ready-to-wear" tells the design seat how the print has carried on each category. It doesn't say to drop it.
-- **Size run (2.4) → stage 11.** The ratio out of 10 is the starting size curve for the buy sheet.
-- **Channel (Appendix A).** "Staff-entered" (the Shopify app and POS) is in-person and WhatsApp sales and pop-ups; it can't be split further. Useful later for stage 16 routing.
+## Step 4: Check the plan before sending it
+
+Read the plan as Khaled would, and note in the report anything that needs his judgement:
+
+- **One-off spikes.** A pop-up or bulk month in last year's window inflates the plan (ready-to-wear's July 2026 is the obvious one). Say so if one month carries a large share of a category's window.
+- **Rework lines.** A *carry only if reworked* silhouette stays in the plan at half weight. Name what has to be fixed.
+- **Capacity.** If no capacity was given, say the first run is unchecked against the team.
+- **Already made.** Stock already made for the focus collection is counted against its silhouette (e.g. 90 Burlwood Wildflower reversible abayas).
 
 ## Step 5: Report
 
-Write the report as a markdown file named `collection-review-<YYYY-MM-DD>.md` and send it with `SendUserFile`. Start from the script's output and add the parts marked ✍️:
+Write `track-a-line-plan-<collection>-<YYYY-MM-DD>.md` and send it with `SendUserFile`:
 
 ```
-# PRNTCODE collection review · stage 00 starting point
-_Shopify sales <period> · directional only (PC-OPS-CDP-09) · focus: <collection or none>_
+[line_plan.py output: What Track A needs · The line, and why · Not in Track A · How the numbers were reached]
 
-## ✍️ The answer
-[3–5 bullets for Khaled at the stage 00 gate: what the year absorbed by category,
-which prints and categories sold through, stock still carried into next year,
-and the one number his budget scenarios should be checked against.]
-
-## Part 1 · Stage 00 inputs            ← script 1.1–1.4
+## ✍️ Settings used, and what to change
+[Window, growth, target sell-through, first run share, capacity: one line each, with the defaults named.
+Any step 4 flags.]
 
 ## ✍️ Still needed to sign the stage 00 budget (not in Shopify)
 | Input | Where it comes from |
 |---|---|
+| Materials cost per style (fabric, trims, print) | the costing sheet / suppliers |
+| Labour minutes per style | the Atelier's standard times (estimates until it has data) |
+| Team capacity before launch | the Atelier |
 | Current cash position and committed spend | Zoho Books / the living cash model (Finance) |
-| Deepwear payment terms, deposit %, MOQs per block | Deepwear (Sophie); MOQs per block are an open item in §10 |
-| Prior landed costs and freight | the costing sheet (stage 10) |
-| Prior non-product costs: sampling, shoots, freelance seat, gifting, launch marketing, factory visit | Zoho Books |
-| Book value of stock on hand | units in 1.3 × landed cost |
-| Track A / Track B split | Khaled's proposal; past sales aren't tagged by track |
-[Mark any row Khaled has already supplied in the conversation as done.]
+| Non-product costs: shoots, gifting, launch marketing, any event | Zoho Books |
+| Book value of stock on hand | units × cost |
 
-## Part 2 · Stage 02 inputs (hand over at stage 02, not before)   ← script 2.1–2.4
-[Add one line under 2.1 for every call you overruled, with the reason.]
-
-## ✍️ Focus: <collection>
-[Which stage it's at, what that means for how this review is used, and its existing listings.]
-
-## Appendix                              ← script A–B
+## Evidence
+[collection_review.py output: Part 1 · Part 2 · Appendix]
 
 ## ✍️ Data caveats
-[Period; sales not tied to a product and how much; placeholder and pre-order stock;
-abaya pace is not sell-through; no margin in Shopify; missing queries.]
+[Period; sales not tied to a product; placeholder and pre-order stock; abaya pace is not
+sell-through; no costs or margin in Shopify; missing queries.]
 ```
 
-Then reply in chat in **five lines or fewer**: the demand baseline in one line, the strongest and weakest print-category pairings in one line, Track A silhouettes to carry and drop in one line, the stage 00 inputs still missing in one line, and the biggest caveat. Don't paste the tables.
+Then reply in chat with the **What Track A needs** bullets as written, plus one line on the biggest caveat or flag. Nothing else; the file has the rest.
 
-If Khaled asks for the review "for Hessa" or "for the designer", send **Part 2 only**, and only once the collection is at stage 02. Before that, say in one line that the process keeps sales data out of stage 01, and offer it for stage 02.
+If Khaled asks to share it with Hessa or the design seat, send the line plan and Part 2, and keep it out of Track B's work.
 
 ## Known data problems (as of 6 Oct 2026)
 
-- **Unnamed sales.** About a fifth of net sales are custom line items on draft orders with no product, mostly one 668-item order in December 2025. They can't be split by print, so they're left out and reported in 1.4.
-- **Placeholder abaya stock.** The pre-April 2026 abaya listings carry 4,000–5,000 units each; the script lists and skips them. Newer abaya listings carry 90–630 units, which may be made-to-order allowances rather than stock: shown in 1.3 as *unverified* and never used for sell-through.
-- **Pre-order listings** (`PRE ORDER - …`, 99 units each) are allowances, not stock, and are left out of 1.3.
-- **No costs in Shopify**, so no margin. Margin comes from the costing sheet.
-- **No track tags.** Listings carry no Track A / Track B tag. Once a collection is built under the two-track model, tagging each listing (an Operations catalogue-review job) lets the review report each track on its own scoreboard.
-- **Returns** show as negative units in a month and as `quantity_returned`. Totals net them off; don't read a negative month as an error.
-- **Launch dates** aren't stored in Shopify. The first month with a sale stands in for launch; `≤` marks pieces already selling when the data starts.
+- **Unnamed sales.** About a fifth of net sales are custom line items with no product, mostly one 668-item order in December 2025. They're left out.
+- **Placeholder abaya stock.** Pre-April 2026 abaya listings carry 4,000–5,000 units each and are skipped. Newer abaya listings (90–630 units) may be made-to-order allowances: shown as *unverified*, never used for sell-through.
+- **Pre-order listings** (`PRE ORDER - …`) are allowances, not stock.
+- **No costs in Shopify**, so no margin.
+- **No track tags** on listings yet. Tagging each listing with its track (an Operations catalogue-review job) will let next year's review score each track on its own.
+- **Launch dates** aren't stored; the first month with a sale stands in.
 - **Data starts June 2025.**
 
-When a new print, colourway name, channel or product type appears, add it to `references/catalogue-map.json` (an alias or a channel group), not to the script. Record the change here if it affects how numbers read.
+When a new print, colourway name, silhouette, channel or product type appears, add it to `references/catalogue-map.json`, not to the scripts.
 
 ## Rules
 
-- Read-only: Shopify analytics, and the Game Plan tracker if connected. Never write to Shopify, Notion, the ledger or a calendar.
-- Directional only. Never present a table as a decision; the gate owners decide.
-- Never feed stage 01, never assign past pieces to a track, never average the tracks, never recommend dropping a print.
-- Don't invent numbers. Every figure in the report comes from the script's tables or the five query results.
-- Hand-offs: pricing and margin go to Sales' `prntcode-pricing`; catalogue tags (including future track tags) to Operations' `prntcode-catalogue-review`.
+- Read-only: Shopify analytics, and the Game Plan tracker if connected.
+- Counts, not designs. Never sketch, describe or name a design.
+- Directional. Every number is a starting point the gate owners can change.
+- Track A only. Never plan Track B from sales or average the tracks; never recommend dropping a print.
+- Don't invent numbers: every figure comes from the scripts or the five query results.
+- Hand-offs: prices and margins to Sales' `prntcode-pricing`; catalogue and track tags to Operations' `prntcode-catalogue-review`; making it to the Atelier (Operations, planned).
