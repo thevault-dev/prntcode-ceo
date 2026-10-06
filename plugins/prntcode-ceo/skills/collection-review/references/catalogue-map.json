@@ -46,10 +46,20 @@
   },
   "fabric_words": ["Cotton", "Silk", "Stitched", "Fabric", "Default Title"],
 
+  "price_bands_aed": [
+    [0, 750, "under 750"],
+    [750, 1250, "750–1,249"],
+    [1250, 1750, "1,250–1,749"],
+    [1750, 2250, "1,750–2,249"],
+    [2250, 1000000, "2,250 and up"]
+  ],
+
   "sell_through_categories": ["Ready-to-wear", "Accessories", "Jalabiya"],
   "placeholder_stock_units": 1000,
+  "not_stock_title_prefixes": ["PRE ORDER"],
 
   "min_units_to_call": 5,
   "launch_window_months": 3,
-  "rework_discount_margin": 0.05
+  "rework_discount_margin": 0.05,
+  "rework_returns_rate": 0.25
 }
