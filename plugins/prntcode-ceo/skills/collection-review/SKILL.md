@@ -1,6 +1,6 @@
 ---
 name: collection-review
-description: PRNTCODE Strategy's collection review. From sales data, says what shape a line's next collection needs to feel whole, as how many tops, bottoms and dresses (or abayas, jalabiyas). It names a silhouette only where customers clearly liked it and leaves every other slot open for the designer. It doesn't choose prints or quantities. One line at a time, each on its own calendar (RTW spring/summer, RTW fall/winter, the abaya drops, Ramadan jalabiyas), with how far the history can be trusted and the evidence behind it. Use when Khaled says "collection review", "how many tops / pants / dresses do we need", "what does the collection need to feel whole", "range plan", "shape of the next collection", "plan spring summer", "check Wildflower against past sales". Read-only. Not the catalogue (tag) review, which is Operations' prntcode-catalogue-review.
+description: PRNTCODE Strategy's collection review. From sales data, says what shape a line's next collection needs to feel whole, as how many tops, bottoms and dresses (or abayas, jalabiyas). It names a silhouette only where customers clearly liked it and leaves every other slot open for the designer. Then an in-depth market read from trade press says where the season is going and where a print-first brand like PRNTCODE can win, with directions for the open slots. It doesn't choose prints or quantities. One line at a time, each on its own calendar (RTW spring/summer, RTW fall/winter, the abaya drops, Ramadan jalabiyas), with how far the history can be trusted and the evidence behind it. Use when Khaled says "collection review", "how many tops / pants / dresses do we need", "what does the collection need to feel whole", "range plan", "shape of the next collection", "plan spring summer", "check Wildflower against past sales", "trend review", "what are the SS27 trends", "where can a print brand win". Read-only. Not the catalogue (tag) review, which is Operations' prntcode-catalogue-review.
 ---
 
 # PRNTCODE collection review (Strategy)
@@ -20,6 +20,8 @@ description: PRNTCODE Strategy's collection review. From sales data, says what s
   Not named: halter top sold 11 but 4 of 15 came back; short sleeve top sold 2.
 …
 ```
+
+**Then the market read:** an in-depth review of where the season is going (prints, silhouettes, colour, fabric), the Gulf customer and calendar, where print-first brands are thriving, and where PRNTCODE can win. It backs or questions the named silhouettes and suggests directions for the open slots, labelled "market says". Customers decide the shape; the market only colours the open slots. See Step 4.
 
 **What it is not:** it doesn't choose prints, quantities to make, or designs. Those are Hessa's and the designer's calls, and the buy is Khaled's. A named silhouette says "customers liked this shape"; an open slot says "the data has nothing to add here".
 
@@ -109,11 +111,19 @@ python3 <skill>/scripts/collection_review.py collection-review-data --line rtw-s
 
 **If you can't run code**, work out the same thing by hand from the results, following "How the shape is worked out".
 
-## Step 4: Report
+## Step 4: The market read
 
-Reply in chat with the `range_plan.py` output as it stands. It's short enough to read on a phone. Add one line only if something needs Khaled's judgement (a family with no liked silhouette at all, or a shape that just missed being named).
+Follow `references/market-read.md`: which season to read for the line, the sources (trade press and serious editorial only), the ten things to cover, and how to run the research. Reuse a saved read for the same line if it's under four weeks old and no show season has passed since.
 
-If Khaled asks for the evidence, send the `collection_review.py --line` output as a markdown file with `SendUserFile`.
+The market read never changes the counts or the named silhouettes. It can only back or question them, and suggest directions for open slots, labelled "market says".
+
+## Step 5: Report
+
+1. **In chat:** the `range_plan.py` output as it stands, then the market read in no more than 8 lines (the season in a sentence, "market says" for each open family, the biggest opportunity). Add one line only if something needs Khaled's judgement (a family with no liked silhouette at all, or a shape that just missed being named).
+2. **The in-depth market read** as a document (the Docs type when listed; otherwise markdown with `SendUserFile`), sources at the end.
+3. If Khaled asks for the sales evidence, send the `collection_review.py --line` output as a markdown file with `SendUserFile`.
+
+If Khaled asks only for the trends ("what are the SS27 trends", "where can a print brand win"), run Step 4 alone and skip the sales data.
 
 ## How titles are read
 
@@ -130,8 +140,9 @@ If Khaled asks for the evidence, send the `collection_review.py --line` output a
 
 ## Rules
 
-- Read-only: Shopify analytics and the Ops App (one SELECT).
+- Read-only: Shopify analytics, the Ops App (one SELECT) and the web.
 - One line per plan, from that line's sales only.
 - Counts of styles by family. **No prints, no quantities, no designs.**
 - Name a silhouette only where the data says customers liked it; everything else stays open.
+- The market read comes from trade press with every claim sourced and dated; it suggests, it doesn't decide.
 - State the confidence. Don't invent numbers.

@@ -17,7 +17,7 @@ Khaled's PRNTCODE agent, **v2.3.0** (Strategy's collection review, 5 Oct 2026). 
 - **Operations** · `prntcode-catalogue-review`: the monthly Shopify tag, variant and collection audit, and the Lumi's Favs rotation. Writes to Shopify only after you approve.
 - **Marketing** · `prntcode-brand-formatter`: puts anything that leaves the company into the PRNTCODE brand.
 - **Sales** · `prntcode-pricing`: prices a collection from its costing sheet, with competitor benchmarks and a branded Excel model.
-- **Strategy** · `collection-review`: from sales data, how many tops, bottoms and dresses the next collection needs to feel whole, naming only what customers clearly liked. No prints or quantities. Read-only.
+- **Strategy** · `collection-review`: from sales data, how many tops, bottoms and dresses the next collection needs to feel whole, naming only what customers clearly liked, plus an in-depth market read (season trends, the Gulf, where print-first brands thrive). No prints or quantities. Read-only.
 
 Finance and the Auditor have a charter only. See [`plugins/prntcode-ceo/org/`](plugins/prntcode-ceo/org/README.md).
 
@@ -106,7 +106,7 @@ The run stops at the Coordinator's "Anything else booked?" and waits for your re
 | `run the tag review` · `catalogue review` · `pick Lumi's favourites` | Operations' monthly catalogue audit; Shopify changes only after your yes |
 | `brand this` · `put this in PRNTCODE format` | Marketing's brand formatter |
 | `price this collection` + a costing sheet | Sales' pricing model: RRP, wholesale, margins, benchmarks, branded Excel |
-| `collection review` · `how many tops, pants and dresses do we need?` · `plan spring summer` | Strategy's collection review: styles per family for the next collection, named where customers liked a shape, open otherwise. Reads Shopify (and the Ops App) only |
+| `collection review` · `how many tops, pants and dresses do we need?` · `plan spring summer` · `what are the SS27 trends?` | Strategy's collection review: styles per family for the next collection, named where customers liked a shape, open otherwise, then a market read of the season and where a print-first brand can win. Reads Shopify, the Ops App and trade press only |
 | `PRNTCODE agent, review this contract` · `can we sign this NDA?` · `can PRNTCODE run this promotion?` | The CEO loads the Legal playbook and hands over to the right `legal:` skill. Sections still marked `_TBD_` are flagged in the first line |
 | `drop X` (after a sync lists a booked block you no longer need) | Say it to your **Coordinator**, which owns the calendar. The PRNTCODE agent can't remove booked blocks. |
 
