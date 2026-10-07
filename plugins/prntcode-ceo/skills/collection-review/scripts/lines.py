@@ -82,60 +82,138 @@ def resolve_line(key_or_name):
     raise SystemExit(f"Unknown line '{key_or_name}'. Known: " + ", ".join(LINES))
 
 
-def in_category(rows, category, classify, title_key="product_title"):
-    kept, unnamed = [], 0
+def line_categories(line_key):
+    L = LINES[line_key]
+    return L.get("categories", [L["category"]])
+
+
+def in_category(rows, categories, classify, title_key="product_title"):
+    """Rows whose listing belongs to one of the categories (a string or a list). Unnamed rows are dropped."""
+    cats = {categories} if isinstance(categories, str) else set(categories)
+    kept = []
     for r in rows:
         t = r.get(title_key, "")
         if is_unnamed(t):
-            unnamed += 1
             continue
-        if classify(t)[0] == category:
+        if classify(t)[0] in cats:
             kept.append(r)
     return kept
 
 
+# ---------- the Ops App (PRNTCODE-ops) ----------
+
+def load_ops(data_dir):
+    """ops.json from the Ops App, or None. Products may come as rows with a products_columns header."""
+    import json
+    import os
+    path = os.path.join(data_dir, "ops.json")
+    if not os.path.exists(path):
+        return None
+    d = json.load(open(path))
+    if d.get("products") and isinstance(d["products"][0], list):
+        cols = d.get("products_columns", ["product_title", "product_type", "collection_id", "print_id", "made_to_order"])
+        d["products"] = [dict(zip(cols, r)) for r in d["products"]]
+    return d
+
+
+def ops_collection_by_name(ops, name):
+    """An Ops App collection whose name appears in `name` (or the reverse), e.g. 'Wildflower SS27' → WLDFLWR."""
+    if not ops or not name:
+        return None
+    n = name.lower()
+    for c in ops.get("collections", []):
+        cn = c["name"].lower()
+        if cn in n or n in cn:
+            return c
+    return None
+
+
 # ---------- history ----------
 
-def collection_history(category, monthly, classify, last_complete):
-    """Per past collection of this category: units by month since launch (month 1 = launch month).
-
-    A listing belongs to the latest collection that launched on or before its first sale.
-    Returns a list of {name, launch, note, curve: [units month 1, month 2, …]} for collections
-    with at least one month of data.
-    """
-    comps = sorted([c for c in MAP["collections"] if c["category"] == category], key=lambda c: c["launch"])
-    if not comps:
-        return []
-    first_sale = {}
-    by_listing = defaultdict(lambda: defaultdict(float))
+def _curves(comps, monthly, last_complete, owner_of):
+    """Units by month since launch for each collection. Sales before launch fold into month 1."""
+    by = {c["name"]: defaultdict(float) for c in comps}
+    pre = defaultdict(float)
+    launch_of_c = {c["name"]: c["launch"] for c in comps}
     for r in monthly:
         t, m = clean_title(r["product_title"]), r["month"][:7]
         if m > last_complete:
             continue
+        owner = owner_of(t)
+        if owner is None:
+            continue
         u = num(r["net_items_sold"])
-        by_listing[t][m] += u
-        if u > 0:
-            first_sale[t] = min(first_sale.get(t, m), m)
+        if m < launch_of_c[owner]:
+            pre[owner] += u
+            m = launch_of_c[owner]
+        by[owner][m] += u
     out = []
     for c in comps:
-        out.append({**c, "curve_by_month": defaultdict(float), "listings": []})
-    for t, months in by_listing.items():
-        fs = first_sale.get(t)
-        if not fs:
-            continue
-        owner = None
-        for c in out:
-            if c["launch"] <= fs:
-                owner = c
-        if owner is None:
-            owner = out[0]
-        owner["listings"].append(t)
-        for m, u in months.items():
-            owner["curve_by_month"][m] += u
-    for c in out:
         n = month_index(last_complete) - month_index(c["launch"]) + 1
-        c["curve"] = [c["curve_by_month"].get(month_str(month_index(c["launch"]) + i), 0.0) for i in range(max(n, 0))]
-    return [c for c in out if c["curve"]]
+        if n <= 0:
+            continue
+        curve = [by[c["name"]].get(month_str(month_index(c["launch"]) + i), 0.0) for i in range(n)]
+        if sum(curve) <= 0:
+            continue
+        out.append({**c, "curve": curve, "prelaunch": pre[c["name"]]})
+    return out
+
+
+def collection_history(categories, monthly, classify, last_complete, ops=None):
+    """Per past collection of these categories: units by month since launch (month 1 = launch month).
+
+    With the Ops App (ops.json), a listing belongs to the collection the Ops App gives it, and launch
+    and close dates come from there. Without it, the 'collections' list in the catalogue map is used,
+    and a listing belongs to the latest collection that launched on or before its first sale.
+    Sales before a collection's launch (a pre-launch or soft launch) count towards month 1.
+    """
+    cats = {categories} if isinstance(categories, str) else set(categories)
+    type_to_cat = MAP["category_from_product_type"]
+    if ops and ops.get("collections") and ops.get("products"):
+        coll_of, types_of = {}, defaultdict(set)
+        for p in ops["products"]:
+            if p.get("collection_id"):
+                coll_of[clean_title(p["product_title"])] = p["collection_id"]
+                types_of[p["collection_id"]].add(type_to_cat.get((p.get("product_type") or "").upper(), p.get("product_type")))
+        comps = []
+        for c in sorted(ops["collections"], key=lambda c: c["launch_date"] or "9999"):
+            if not c.get("launch_date") or not (types_of[c["collection_id"]] & cats):
+                continue
+            if c["launch_date"][:7] > last_complete:
+                continue
+            comps.append({"name": c["name"], "id": c["collection_id"], "launch": c["launch_date"][:7],
+                          "sunset": (c.get("sunset_date") or "")[:7] or None, "source": "Ops App",
+                          "note": f"launched {c['launch_date']}" + (f", closes {c['sunset_date']}" if c.get("sunset_date") else "")})
+        name_of = {c["id"]: c["name"] for c in comps}
+
+        def owner_of(t):
+            if classify(t)[0] not in cats:
+                return None
+            return name_of.get(coll_of.get(t))
+        found = _curves(comps, monthly, last_complete, owner_of)
+        if found:
+            return found
+        # the Ops App has no collection for these categories yet: fall back to the catalogue map
+
+    comps = sorted([c for c in MAP["collections"] if c["category"] in cats], key=lambda c: c["launch"])
+    if not comps:
+        return []
+    first_sale = {}
+    for r in monthly:
+        t, m = clean_title(r["product_title"]), r["month"][:7]
+        if num(r["net_items_sold"]) > 0 and classify(t)[0] in cats:
+            first_sale[t] = min(first_sale.get(t, m), m)
+
+    def owner_of(t):
+        fs = first_sale.get(t)
+        if not fs or classify(t)[0] not in cats:
+            return None
+        owner = comps[0]["name"]
+        for c in comps:
+            if c["launch"] <= fs:
+                owner = c["name"]
+        return owner
+    return _curves([{**c, "source": "catalogue map"} for c in comps], monthly, last_complete, owner_of)
 
 
 def confidence_for(months_observed, n_collections, basis):

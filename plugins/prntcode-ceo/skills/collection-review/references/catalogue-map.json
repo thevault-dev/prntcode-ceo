@@ -113,9 +113,9 @@
     "carryover_max_share": 0.5,
     "units_per_style": {
       "Abaya": 20,
-      "Ready-to-wear": 10,
+      "Ready-to-wear": 5,
       "Jalabiya": 6,
-      "Accessories": 10
+      "Accessories": 5
     },
     "weight_by_call": {
       "Carry into Track A": 1.0,
@@ -148,7 +148,21 @@
       "Scarf": "Accessories",
       "Twilly": "Accessories"
     },
-    "_note": "first_run_share now depends on confidence (see 'confidence'); the selling window comes from the line's calendar."
+    "_note": "first_run_share now depends on confidence (see 'confidence'); the selling window comes from the line's calendar.",
+    "_depth_note": "In-house production: go wider and shallower (Oct 2026). 4–6 pieces per RTW style, restocking what sells.",
+    "test_style_units": 3,
+    "max_test_styles": 4,
+    "prints_per_collection": null,
+    "_prints_note": "prints_per_collection: null = the number of prints in the line's last collection (Ops App). When there are too few styles to give every print at least min_styles_per_print garments, fewer prints are used, so each print is a real set.",
+    "family_order": [
+      "Tops",
+      "Bottoms",
+      "Dresses",
+      "Abayas",
+      "Jalabiyas",
+      "Accessories"
+    ],
+    "min_styles_per_print": 4
   },
   "_lines_about": "Each product line runs on its own calendar (from the PRNTCODE Collection Calendar, PC-OPS-CAL-01). A plan is always for one line, against that line's own history; lines are never blended. Update when the calendar changes.",
   "lines": {
@@ -163,7 +177,12 @@
       "category": "Ready-to-wear",
       "launch_month": 4,
       "ends_at_line": "rtw-fw",
-      "basis": "collection"
+      "basis": "collection",
+      "categories": [
+        "Ready-to-wear",
+        "Accessories"
+      ],
+      "accessories_note": "Accessories belong to the RTW collection (as in the Ops App) and are cut from the same fabrics."
     },
     "rtw-fw": {
       "name": "RTW Fall/Winter",
@@ -177,7 +196,12 @@
       "category": "Ready-to-wear",
       "launch_month": 10,
       "ends_at_line": "rtw-ss",
-      "basis": "collection"
+      "basis": "collection",
+      "categories": [
+        "Ready-to-wear",
+        "Accessories"
+      ],
+      "accessories_note": "Accessories belong to the RTW collection (as in the Ops App) and are cut from the same fabrics."
     },
     "abaya-initial": {
       "name": "Abaya Initial drop",
@@ -188,7 +212,10 @@
       "category": "Abaya",
       "launch_month": 9,
       "ends_at_line": "abaya-pre-ramadan",
-      "basis": "seasonal"
+      "basis": "seasonal",
+      "categories": [
+        "Abaya"
+      ]
     },
     "abaya-pre-ramadan": {
       "name": "Abaya Pre-Ramadan drop",
@@ -199,7 +226,10 @@
       "category": "Abaya",
       "launch": "pre-ramadan",
       "ends_at_line": "abaya-summer",
-      "basis": "seasonal"
+      "basis": "seasonal",
+      "categories": [
+        "Abaya"
+      ]
     },
     "abaya-summer": {
       "name": "Abaya Summer drop",
@@ -209,7 +239,10 @@
       "category": "Abaya",
       "launch_month": 6,
       "ends_at_line": "abaya-initial",
-      "basis": "seasonal"
+      "basis": "seasonal",
+      "categories": [
+        "Abaya"
+      ]
     },
     "jalabiya": {
       "name": "Jalabiya (Ramadan)",
@@ -225,7 +258,10 @@
       "window_note": "Ramadan and Eid",
       "basis": "collection",
       "expect_launch_peak": true,
-      "peak_note": "Jalabiyas sell in the Ramadan launch month by design, so a launch-month peak is expected, not a one-off."
+      "peak_note": "Jalabiyas sell in the Ramadan launch month by design, so a launch-month peak is expected, not a one-off.",
+      "categories": [
+        "Jalabiya"
+      ]
     },
     "swimwear": {
       "name": "Swimwear",
@@ -237,7 +273,10 @@
       "launch_month": 5,
       "window_months": 5,
       "window_note": "summer",
-      "basis": "collection"
+      "basis": "collection",
+      "categories": [
+        "Swimwear"
+      ]
     }
   },
   "_collections_about": "Past collections, so a new one can be lined up against them by months since launch. A listing belongs to the latest collection of its category that launched on or before its first sale. Add each new collection when it launches.",
@@ -251,8 +290,8 @@
     {
       "name": "The Jungle Edit",
       "category": "Ready-to-wear",
-      "launch": "2026-06",
-      "note": "PRNTCODE's first RTW collection; its launch slipped to June 2026"
+      "launch": "2026-07",
+      "note": "PRNTCODE's first RTW collection; launched 1 July 2026 after a delay, with pre-launch sales in June"
     }
   ],
   "_ramadan_about": "Approximate first day of Ramadan (Umm al-Qura). Check against the official announcement each year.",
@@ -277,5 +316,16 @@
       "first_run_share": 0.7,
       "blend_equal": 0.0
     }
-  }
+  },
+  "print_codes": {
+    "BLM": "Blooming Field",
+    "BTF": "Butterfly",
+    "CHKOR": "Checkered Orchid",
+    "CODEDCH": "Coded Cheetah",
+    "FLDOT": "Flutter Dot",
+    "ICDOT": "Iconic Dots",
+    "META": "Metamorphosis",
+    "MIXED": "Mixed Prints"
+  },
+  "_ops_about": "When ops.json (from the PRNTCODE Ops App, Supabase project PRNTCODE-ops) is in the data folder, its collections, product-to-collection links, fabric stock and yields override the 'collections' list above."
 }

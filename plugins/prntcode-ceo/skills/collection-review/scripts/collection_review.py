@@ -224,25 +224,27 @@ def main():
     # ---------- one line only (--line): its category's sales, and how far to trust them ----------
     line_arg, conf, line_name = opt("--line"), "high", None
     if line_arg:
-        from lines import LINES, collection_history, confidence_for, resolve_line
+        from lines import LINES, collection_history, confidence_for, line_categories, load_ops, resolve_line
         lk = resolve_line(line_arg)
-        line_name, cat_f = LINES[lk]["name"], LINES[lk]["category"]
+        line_name, cats_f = LINES[lk]["name"], line_categories(lk)
+        cat_f = " and ".join(c.lower() for c in cats_f)
 
         def keep(r, key="product_title"):
             t = r.get(key, "")
-            return is_unnamed(t) or classify(t)[0] == cat_f
+            return is_unnamed(t) or classify(t)[0] in cats_f
 
         products = [r for r in products if keep(r)]
         channels = [r for r in channels if keep(r)] if channels else channels
         monthly = [r for r in monthly if keep(r)] if monthly else monthly
         inventory = [r for r in inventory if keep(r)] if inventory else inventory
         variants = [r for r in variants if is_unnamed(r.get("product_title", ""))
-                    or parse_title(r["product_title"], r.get("product_type", ""))[0] == cat_f] if variants else variants
+                    or parse_title(r["product_title"], r.get("product_type", ""))[0] in cats_f] if variants else variants
         if monthly:
             tm = datetime.date.today().strftime("%Y-%m")
             last_c = max(r["month"][:7] for r in monthly if r["month"][:7] < tm)
             if LINES[lk]["basis"] == "collection":
-                comps = collection_history(cat_f, [r for r in monthly if not is_unnamed(r["product_title"])], classify, last_c)
+                comps = collection_history(cats_f, [r for r in monthly if not is_unnamed(r["product_title"])], classify, last_c,
+                                           load_ops(data_dir))
                 obs = max((len(c["curve"]) for c in comps), default=0)
                 conf = confidence_for(obs, len(comps), "collection")
             else:
@@ -364,7 +366,7 @@ def main():
     out.append("# PRNTCODE collection review · stage 00 starting point")
     out.append(f"_Shopify sales, {period}. Directional only (PC-OPS-CDP-09). Feeds stage 00 and stage 02. Not for stage 01, which runs without sales data._")
     if line_name:
-        out.append(f"_Evidence for **{line_name}** only: {cat_f.lower()} sales. Confidence in this history: **{conf}**._")
+        out.append(f"_Evidence for **{line_name}** only: {cat_f} sales. Confidence in this history: **{conf}**._")
 
     # ---------- PART 1 ----------
     out.append("\n## Part 1 · Stage 00 inputs (envelope and collection budget)")
