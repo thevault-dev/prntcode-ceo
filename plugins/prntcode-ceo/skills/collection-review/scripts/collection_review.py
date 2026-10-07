@@ -173,11 +173,17 @@ def add(a, r):
     a["net"] += num(r.get("net_sales"))
 
 
-def silhouette_call(units, disc, cat_disc, returns, months_on, net, fair):
-    """The Track A call for one silhouette (rules in SKILL.md, step 4). Shared with line_plan.py."""
+def silhouette_call(units, disc, cat_disc, returns, months_on, net, fair, confidence="high"):
+    """The Track A call for one silhouette (rules in SKILL.md). Shared with line_plan.py.
+
+    With low or medium confidence in the line's history, a silhouette with few sales is
+    "unproven", not dropped: there isn't enough data to say it failed.
+    """
     if months_on is not None and months_on < MAP["launch_window_months"]:
         return "Too new to call"
     if units < MAP["min_units_to_call"]:
+        if confidence in ("low", "medium"):
+            return "Unproven: too few sales to judge"
         return "Drop from Track A (could return as Track B)" if months_on is not None else "Too few to call"
     if disc > cat_disc + MAP["rework_discount_margin"]:
         return "Carry only if reworked: sold on discount"
@@ -214,6 +220,35 @@ def main():
 
     def classify(title):
         return parse_title(title, ptype_of.get(clean_title(title), ""))
+
+    # ---------- one line only (--line): its category's sales, and how far to trust them ----------
+    line_arg, conf, line_name = opt("--line"), "high", None
+    if line_arg:
+        from lines import LINES, collection_history, confidence_for, resolve_line
+        lk = resolve_line(line_arg)
+        line_name, cat_f = LINES[lk]["name"], LINES[lk]["category"]
+
+        def keep(r, key="product_title"):
+            t = r.get(key, "")
+            return is_unnamed(t) or classify(t)[0] == cat_f
+
+        products = [r for r in products if keep(r)]
+        channels = [r for r in channels if keep(r)] if channels else channels
+        monthly = [r for r in monthly if keep(r)] if monthly else monthly
+        inventory = [r for r in inventory if keep(r)] if inventory else inventory
+        variants = [r for r in variants if is_unnamed(r.get("product_title", ""))
+                    or parse_title(r["product_title"], r.get("product_type", ""))[0] == cat_f] if variants else variants
+        if monthly:
+            tm = datetime.date.today().strftime("%Y-%m")
+            last_c = max(r["month"][:7] for r in monthly if r["month"][:7] < tm)
+            if LINES[lk]["basis"] == "collection":
+                comps = collection_history(cat_f, [r for r in monthly if not is_unnamed(r["product_title"])], classify, last_c)
+                obs = max((len(c["curve"]) for c in comps), default=0)
+                conf = confidence_for(obs, len(comps), "collection")
+            else:
+                sold = sorted(r["month"][:7] for r in monthly if not is_unnamed(r["product_title"]) and num(r["net_items_sold"]) > 0)
+                obs = month_index(last_c) - month_index(sold[0]) + 1 if sold else 0
+                conf = confidence_for(obs, 0, "seasonal")
 
     minu = MAP["min_units_to_call"]
     W = MAP["launch_window_months"]
@@ -328,6 +363,8 @@ def main():
     # =====================================================================
     out.append("# PRNTCODE collection review · stage 00 starting point")
     out.append(f"_Shopify sales, {period}. Directional only (PC-OPS-CDP-09). Feeds stage 00 and stage 02. Not for stage 01, which runs without sales data._")
+    if line_name:
+        out.append(f"_Evidence for **{line_name}** only: {cat_f.lower()} sales. Confidence in this history: **{conf}**._")
 
     # ---------- PART 1 ----------
     out.append("\n## Part 1 · Stage 00 inputs (envelope and collection budget)")
@@ -345,7 +382,7 @@ def main():
     out.append(table(["Category", "Print", "Units", "Net AED", "Discount", "Sell-through", "Units / month"], rows))
 
     out.append("\n### 1.2 What the year absorbed, by category")
-    out.append("_The demand baseline behind each budget scenario's unit buy. Last 6 months shows the current run rate; ready-to-wear launched mid-year, so its average understates it._")
+    out.append("_The demand baseline behind each budget scenario's unit buy. Units a month count only the months since the category's first sale, so a category that launched mid-year isn't understated. For a collection-based line the plan's launch-aligned history is the better guide._")
     cat_month = defaultdict(lambda: defaultdict(float))
     if monthly:
         for r in monthly:
@@ -358,9 +395,11 @@ def main():
     for c in cats:
         v = by_cat[c]
         cm = cat_month.get(c, {})
+        sold_m = sorted(m for m, u in cm.items() if u > 0)
+        c_months = month_index(last_m) - month_index(sold_m[0]) + 1 if sold_m and last_m else None
         rows.append([c, f"{v['units']:.0f}", aed(v["net"]), p100(pct(v["net"], named_net)),
                      aed(pct(v["net"], v["units"])),
-                     f"{pct(v['units'], n_months):.1f}" if n_months else "–",
+                     f"{pct(v['units'], c_months):.1f} ({c_months} mo)" if c_months else "–",
                      f"{sum(cm.get(m, 0) for m in last6) / len(last6):.1f}" if last6 and cm else "–"])
     out.append(table(["Category", "Units", "Net AED", "Share", "Avg AED / unit", "Units / month", "Last 6 months / month"], rows))
     result["categories"] = {c: dict(by_cat[c]) for c in cats}
@@ -386,7 +425,10 @@ def main():
         out.append("_inventory.json missing: skipped._")
 
     out.append("\n### 1.4 Sales not tied to a product")
-    out.append(f"AED {aed(un_net)} across {un_units:.0f} items ({p100(pct(un_net, tot_net))} of net sales of AED {aed(tot_net)}): custom line items and blank or 'Untitled' listings. Left out of every table above.")
+    if line_name:
+        out.append(f"Business-wide, AED {aed(un_net)} across {un_units:.0f} items are custom line items or blank / 'Untitled' listings. They can't be assigned to {line_name} or any other line, so they're left out.")
+    else:
+        out.append(f"AED {aed(un_net)} across {un_units:.0f} items ({p100(pct(un_net, tot_net))} of net sales of AED {aed(tot_net)}): custom line items and blank or 'Untitled' listings. Left out of every table above.")
     if monthly:
         for r in monthly:
             if is_unnamed(r["product_title"]) and num(r["net_items_sold"]) >= 50:
@@ -406,11 +448,11 @@ def main():
             v = by_sil[k]
             disc = pct(v["disc"], v["gross"])
             mo = months_on(c, sil=k[1])
-            call = silhouette_call(v["units"], disc, cat_disc[c], pct(v["returned"], v["ordered"]), mo, v["net"], fair)
+            call = silhouette_call(v["units"], disc, cat_disc[c], pct(v["returned"], v["ordered"]), mo, v["net"], fair, conf)
             ret = pct(v["returned"], v["ordered"])
             rows.append([c, k[1], f"{v['units']:.0f}", aed(v["net"]), p100(disc), p100(ret), st_cell(c, stock_sil, k), call])
             calls.append({"category": c, "silhouette": k[1], "units": v["units"], "discount": disc, "returns": ret, "call": call})
-    out.append(f"_Rules: fewer than {W} months on sale = too new; under {minu} units = drop from Track A; discount over {p100(margin)} points above its category, or returns over {p100(ret_max)}, = rework; at or above its fair share of category sales = carry. Overrule any call with a reason._")
+    out.append(f"_Rules: fewer than {W} months on sale = too new; under {minu} units = {'unproven (thin history)' if conf in ('low', 'medium') else 'drop from Track A'}; discount over {p100(margin)} points above its category, or returns over {p100(ret_max)}, = rework; at or above its fair share of category sales = carry. Overrule any call with a reason._")
     out.append(table(["Category", "Silhouette", "Units", "Net AED", "Discount", "Returns", "Sell-through", "Call"], rows))
     out.append("_Returns = units returned ÷ units ordered. A high rate is a fit or make question for the pattern before it goes back into production._")
     result["silhouettes"] = calls
