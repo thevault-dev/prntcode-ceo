@@ -3,7 +3,7 @@
 **Will own:** the longer view. That means what sold in past collections and why, yearly and quarterly targets, the cadence of drops and events, the project portfolio (which collections, collabs and pop-ups to say yes to), and market and competitor scans.
 
 **Skills (live)**
-- [`collection-review`](../../skills/collection-review/SKILL.md): ends in the **Track A line plan** for the next collection, as counts not designs ("10 tops: 5 long-sleeve, 4 smocked, 1 halter"), with units, first run and restock, size split, last year's price, carry-over and new print slots, and the reason for every line. It's planned for in-house production. Behind it sits the evidence from prior-year Shopify sales and the stage 00 budget inputs (Collection Design Process, PC-OPS-CDP-09). Never plans Track B, never averages the tracks. Read-only on Shopify analytics.
+- [`collection-review`](../../skills/collection-review/SKILL.md): from sales data, what shape a line's next collection needs to feel whole: how many tops, bottoms and dresses (or abayas, jalabiyas), naming a silhouette only where customers clearly liked it and leaving the rest open for the designer. No prints, quantities or designs. One line at a time on its own calendar, with its confidence stated. Read-only on Shopify analytics and the Ops App.
 
 **Planned:** target setting, the cadence plan, portfolio review (from the "Game Plan" projects tracker the Monday Pack already uses), the quarterly direction review, and market scans.
 

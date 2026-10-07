@@ -174,7 +174,7 @@ def add(a, r):
 
 
 def silhouette_call(units, disc, cat_disc, returns, months_on, net, fair, confidence="high"):
-    """The Track A call for one silhouette (rules in SKILL.md). Shared with line_plan.py.
+    """The Track A call for one silhouette (rules in SKILL.md). Shared with range_plan.py.
 
     With low or medium confidence in the line's history, a silhouette with few sales is
     "unproven", not dropped: there isn't enough data to say it failed.

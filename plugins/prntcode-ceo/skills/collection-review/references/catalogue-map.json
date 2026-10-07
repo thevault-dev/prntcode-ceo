@@ -105,65 +105,6 @@
   "launch_window_months": 3,
   "rework_discount_margin": 0.05,
   "rework_returns_rate": 0.25,
-  "_plan_about": "Settings for line_plan.py (the Track A line plan). Every number here is a starting assumption for Khaled to change, not a fact. In-house production since Oct 2026: no MOQs, so a first run plus a restock reserve replaces one bulk buy.",
-  "plan": {
-    "growth": 0.0,
-    "target_sell_through": 0.8,
-    "track_a_share": 0.65,
-    "carryover_max_share": 0.5,
-    "units_per_style": {
-      "Abaya": 20,
-      "Ready-to-wear": 5,
-      "Jalabiya": 6,
-      "Accessories": 5
-    },
-    "weight_by_call": {
-      "Carry into Track A": 1.0,
-      "Too new to call": 1.0,
-      "Watch": 0.5,
-      "Carry only if reworked: sold on discount": 0.5,
-      "Carry only if reworked: high returns": 0.5
-    },
-    "families": {
-      "Long Sleeve Top": "Tops",
-      "Smocked Top": "Tops",
-      "Halter Top": "Tops",
-      "Short Sleeve Top": "Tops",
-      "Top": "Tops",
-      "Shirt": "Tops",
-      "Long Skirt": "Bottoms",
-      "Midi Skirt": "Bottoms",
-      "Short Skirt": "Bottoms",
-      "Pants": "Bottoms",
-      "Shorts": "Bottoms",
-      "Long Dress": "Dresses",
-      "Slit Dress": "Dresses",
-      "Panel Dress": "Dresses",
-      "Short Dress": "Dresses",
-      "Reversible Abaya": "Abayas",
-      "Abaya": "Abayas",
-      "Jalabiya": "Jalabiyas",
-      "Scrunchie": "Accessories",
-      "Head Scarf": "Accessories",
-      "Scarf": "Accessories",
-      "Twilly": "Accessories"
-    },
-    "_note": "first_run_share now depends on confidence (see 'confidence'); the selling window comes from the line's calendar.",
-    "_depth_note": "In-house production: go wider and shallower (Oct 2026). 4–6 pieces per RTW style, restocking what sells.",
-    "test_style_units": 3,
-    "max_test_styles": 4,
-    "prints_per_collection": null,
-    "_prints_note": "prints_per_collection: null = the number of prints in the line's last collection (Ops App). When there are too few styles to give every print at least min_styles_per_print garments, fewer prints are used, so each print is a real set.",
-    "family_order": [
-      "Tops",
-      "Bottoms",
-      "Dresses",
-      "Abayas",
-      "Jalabiyas",
-      "Accessories"
-    ],
-    "min_styles_per_print": 4
-  },
   "_lines_about": "Each product line runs on its own calendar (from the PRNTCODE Collection Calendar, PC-OPS-CAL-01). A plan is always for one line, against that line's own history; lines are never blended. Update when the calendar changes.",
   "lines": {
     "rtw-ss": {
@@ -181,8 +122,7 @@
       "categories": [
         "Ready-to-wear",
         "Accessories"
-      ],
-      "accessories_note": "Accessories belong to the RTW collection (as in the Ops App) and are cut from the same fabrics."
+      ]
     },
     "rtw-fw": {
       "name": "RTW Fall/Winter",
@@ -200,8 +140,7 @@
       "categories": [
         "Ready-to-wear",
         "Accessories"
-      ],
-      "accessories_note": "Accessories belong to the RTW collection (as in the Ops App) and are cut from the same fabrics."
+      ]
     },
     "abaya-initial": {
       "name": "Abaya Initial drop",
@@ -327,5 +266,52 @@
     "META": "Metamorphosis",
     "MIXED": "Mixed Prints"
   },
-  "_ops_about": "When ops.json (from the PRNTCODE Ops App, Supabase project PRNTCODE-ops) is in the data folder, its collections, product-to-collection links, fabric stock and yields override the 'collections' list above."
+  "_range_about": "Settings for range_plan.py: how many tops, bottoms and dresses a collection needs to feel whole. Starting assumptions for Khaled to change.",
+  "range": {
+    "styles": null,
+    "_styles_note": "null = as many silhouettes as the line's last collection had (Ops App). Set a number to override.",
+    "min_per_family": 2,
+    "open_slots_per_family": 1,
+    "max_per_silhouette": 2,
+    "liked_calls": [
+      "Carry into Track A"
+    ],
+    "family_order": [
+      "Tops",
+      "Bottoms",
+      "Dresses",
+      "Abayas",
+      "Jalabiyas"
+    ],
+    "families": {
+      "Ready-to-wear": {
+        "Long Sleeve Top": "Tops",
+        "Smocked Top": "Tops",
+        "Halter Top": "Tops",
+        "Short Sleeve Top": "Tops",
+        "Top": "Tops",
+        "Shirt": "Tops",
+        "Long Skirt": "Bottoms",
+        "Midi Skirt": "Bottoms",
+        "Short Skirt": "Bottoms",
+        "Pants": "Bottoms",
+        "Shorts": "Bottoms",
+        "Long Dress": "Dresses",
+        "Slit Dress": "Dresses",
+        "Panel Dress": "Dresses",
+        "Short Dress": "Dresses"
+      },
+      "Abaya": {
+        "Reversible Abaya": "Abayas",
+        "Abaya": "Abayas"
+      },
+      "Jalabiya": {
+        "Jalabiya": "Jalabiyas"
+      }
+    },
+    "second_slot_sell_through": 0.5,
+    "second_slot_family_share": 0.4,
+    "_second_slot_note": "A liked silhouette gets a second slot (a second version) when it sold through more than half its stock, or, where stock isn't tracked (abayas), when it made up at least 40% of its family's sales. Otherwise one slot each; the rest stay open."
+  },
+  "_ops_about": "When ops.json (from the PRNTCODE Ops App, Supabase project PRNTCODE-ops) is in the data folder, its collections and product-to-collection links override the 'collections' list above."
 }
