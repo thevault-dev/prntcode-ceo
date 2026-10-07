@@ -279,8 +279,9 @@ def main():
         f[2].append(f"{l['styles']} {plural(l['silhouette'].lower(), l['styles'])}")
     out.append("\n## What Track A needs")
     for (cat, f_), (n, u, parts) in sorted(fam.items(), key=lambda x: -x[1][1]):
-        label = f_.lower() if n != 1 else f_.lower().rstrip("s")
-        label = {"accessorie": "accessory"}.get(label, label)
+        label = f_.lower()
+        if n == 1:
+            label = label[:-2] if label.endswith("sses") else label[:-3] + "y" if label.endswith("ies") else label[:-1] if label.endswith("s") else label
         out.append(f"- **{n} {label}** ({', '.join(parts)}) · {u} units")
     made_total = sum(l["already_made"] for l in lines)
     out.append(f"- **Total:** {sum(l['styles'] for l in lines)} styles, {a_units} units. "
