@@ -1,0 +1,317 @@
+{
+  "_about": "How collection_review.py reads PRNTCODE product titles. Edit this file, not the script, when a print, colourway or channel changes. Last reviewed 5 Oct 2026.",
+  "print_aliases": {
+    "Metamorphosis Lavender": "Metamorphosis",
+    "Metamorphasis Lavender": "Metamorphosis",
+    "Bloomingfield": "Blooming Field",
+    "Iconic Dot": "Iconic Dots",
+    "Iconic Dot Saffron": "Iconic Dots",
+    "Butterfly": "Butterfly"
+  },
+  "known_prints": [
+    "Blooming Field",
+    "Butterfly",
+    "Checkered Orchid",
+    "Iconic Dots",
+    "Metamorphosis",
+    "Coded Cheetah",
+    "Flutter Dot",
+    "Mixed Prints"
+  ],
+  "category_from_product_type": {
+    "ABAYA": "Abaya",
+    "RTW": "Ready-to-wear",
+    "JALABIYA": "Jalabiya",
+    "ACCESSORIES": "Accessories"
+  },
+  "jalabiya_marker": "MKWR",
+  "accessory_words": [
+    "Scrunchie",
+    "Scrunchies",
+    "Head Scarf",
+    "Scarf",
+    "Twilly",
+    "Twillies"
+  ],
+  "channel_groups": {
+    "Staff-entered (in person or WhatsApp)": [
+      "Shopify Mobile for iPhone",
+      "Shopify Mobile for Android",
+      "Point of Sale"
+    ],
+    "Online store": [
+      "Online Store"
+    ],
+    "Draft orders": [
+      "Draft Orders"
+    ]
+  },
+  "size_words": {
+    "XS": "XS",
+    "X-Small": "XS",
+    "S": "Small",
+    "Small": "Small",
+    "M": "Medium",
+    "Medium": "Medium",
+    "L": "Large",
+    "Large": "Large",
+    "XL": "XL",
+    "X-Large": "XL"
+  },
+  "fabric_words": [
+    "Cotton",
+    "Silk",
+    "Stitched",
+    "Fabric",
+    "Default Title"
+  ],
+  "price_bands_aed": [
+    [
+      0,
+      750,
+      "under 750"
+    ],
+    [
+      750,
+      1250,
+      "750–1,249"
+    ],
+    [
+      1250,
+      1750,
+      "1,250–1,749"
+    ],
+    [
+      1750,
+      2250,
+      "1,750–2,249"
+    ],
+    [
+      2250,
+      1000000,
+      "2,250 and up"
+    ]
+  ],
+  "sell_through_categories": [
+    "Ready-to-wear",
+    "Accessories",
+    "Jalabiya"
+  ],
+  "placeholder_stock_units": 1000,
+  "not_stock_title_prefixes": [
+    "PRE ORDER"
+  ],
+  "min_units_to_call": 5,
+  "launch_window_months": 3,
+  "rework_discount_margin": 0.05,
+  "rework_returns_rate": 0.25,
+  "_lines_about": "Each product line runs on its own calendar (from the PRNTCODE Collection Calendar, PC-OPS-CAL-01). A plan is always for one line, against that line's own history; lines are never blended. Update when the calendar changes.",
+  "lines": {
+    "rtw-ss": {
+      "name": "RTW Spring/Summer",
+      "aliases": [
+        "ss",
+        "spring summer",
+        "spring/summer",
+        "rtw ss"
+      ],
+      "category": "Ready-to-wear",
+      "launch_month": 4,
+      "ends_at_line": "rtw-fw",
+      "basis": "collection",
+      "categories": [
+        "Ready-to-wear",
+        "Accessories"
+      ]
+    },
+    "rtw-fw": {
+      "name": "RTW Fall/Winter",
+      "aliases": [
+        "fw",
+        "fall winter",
+        "fall/winter",
+        "rtw fw",
+        "aw"
+      ],
+      "category": "Ready-to-wear",
+      "launch_month": 10,
+      "ends_at_line": "rtw-ss",
+      "basis": "collection",
+      "categories": [
+        "Ready-to-wear",
+        "Accessories"
+      ]
+    },
+    "abaya-initial": {
+      "name": "Abaya Initial drop",
+      "aliases": [
+        "abaya initial",
+        "abaya september"
+      ],
+      "category": "Abaya",
+      "launch_month": 9,
+      "ends_at_line": "abaya-pre-ramadan",
+      "basis": "seasonal",
+      "categories": [
+        "Abaya"
+      ]
+    },
+    "abaya-pre-ramadan": {
+      "name": "Abaya Pre-Ramadan drop",
+      "aliases": [
+        "abaya ramadan",
+        "abaya pre-ramadan"
+      ],
+      "category": "Abaya",
+      "launch": "pre-ramadan",
+      "ends_at_line": "abaya-summer",
+      "basis": "seasonal",
+      "categories": [
+        "Abaya"
+      ]
+    },
+    "abaya-summer": {
+      "name": "Abaya Summer drop",
+      "aliases": [
+        "abaya summer"
+      ],
+      "category": "Abaya",
+      "launch_month": 6,
+      "ends_at_line": "abaya-initial",
+      "basis": "seasonal",
+      "categories": [
+        "Abaya"
+      ]
+    },
+    "jalabiya": {
+      "name": "Jalabiya (Ramadan)",
+      "aliases": [
+        "jalabiya",
+        "jelabiya",
+        "jalabiyas",
+        "ramadan"
+      ],
+      "category": "Jalabiya",
+      "launch": "pre-ramadan",
+      "window_months": 2,
+      "window_note": "Ramadan and Eid",
+      "basis": "collection",
+      "expect_launch_peak": true,
+      "peak_note": "Jalabiyas sell in the Ramadan launch month by design, so a launch-month peak is expected, not a one-off.",
+      "categories": [
+        "Jalabiya"
+      ]
+    },
+    "swimwear": {
+      "name": "Swimwear",
+      "aliases": [
+        "swim",
+        "swimwear"
+      ],
+      "category": "Swimwear",
+      "launch_month": 5,
+      "window_months": 5,
+      "window_note": "summer",
+      "basis": "collection",
+      "categories": [
+        "Swimwear"
+      ]
+    }
+  },
+  "_collections_about": "Past collections, so a new one can be lined up against them by months since launch. A listing belongs to the latest collection of its category that launched on or before its first sale. Add each new collection when it launches.",
+  "collections": [
+    {
+      "name": "Ramadan 2026 jalabiyas",
+      "category": "Jalabiya",
+      "launch": "2026-02",
+      "note": "MKWR and The Noor Creative pieces"
+    },
+    {
+      "name": "The Jungle Edit",
+      "category": "Ready-to-wear",
+      "launch": "2026-07",
+      "note": "PRNTCODE's first RTW collection; launched 1 July 2026 after a delay, with pre-launch sales in June"
+    }
+  ],
+  "_ramadan_about": "Approximate first day of Ramadan (Umm al-Qura). Check against the official announcement each year.",
+  "ramadan_starts": {
+    "2026": "2026-02-18",
+    "2027": "2027-02-08",
+    "2028": "2028-01-28",
+    "2029": "2029-01-16"
+  },
+  "spike_share": 0.5,
+  "_confidence_about": "How far a line's history can be trusted. low: one past collection with under 6 months of sales (or under 6 months of seasonal history). medium: 6+ months. high: 2+ collections with 6+ months, or 12+ months of seasonal history. Lower confidence commits less up front, spreads units more evenly, and calls thin silhouettes unproven instead of dropping them.",
+  "confidence": {
+    "low": {
+      "first_run_share": 0.5,
+      "blend_equal": 0.5
+    },
+    "medium": {
+      "first_run_share": 0.6,
+      "blend_equal": 0.25
+    },
+    "high": {
+      "first_run_share": 0.7,
+      "blend_equal": 0.0
+    }
+  },
+  "print_codes": {
+    "BLM": "Blooming Field",
+    "BTF": "Butterfly",
+    "CHKOR": "Checkered Orchid",
+    "CODEDCH": "Coded Cheetah",
+    "FLDOT": "Flutter Dot",
+    "ICDOT": "Iconic Dots",
+    "META": "Metamorphosis",
+    "MIXED": "Mixed Prints"
+  },
+  "_range_about": "Settings for range_plan.py: how many tops, bottoms and dresses a collection needs to feel whole. Starting assumptions for Khaled to change.",
+  "range": {
+    "styles": null,
+    "_styles_note": "null = as many silhouettes as the line's last collection had (Ops App). Set a number to override.",
+    "min_per_family": 2,
+    "open_slots_per_family": 1,
+    "max_per_silhouette": 2,
+    "liked_calls": [
+      "Carry into Track A"
+    ],
+    "family_order": [
+      "Tops",
+      "Bottoms",
+      "Dresses",
+      "Abayas",
+      "Jalabiyas"
+    ],
+    "families": {
+      "Ready-to-wear": {
+        "Long Sleeve Top": "Tops",
+        "Smocked Top": "Tops",
+        "Halter Top": "Tops",
+        "Short Sleeve Top": "Tops",
+        "Top": "Tops",
+        "Shirt": "Tops",
+        "Long Skirt": "Bottoms",
+        "Midi Skirt": "Bottoms",
+        "Short Skirt": "Bottoms",
+        "Pants": "Bottoms",
+        "Shorts": "Bottoms",
+        "Long Dress": "Dresses",
+        "Slit Dress": "Dresses",
+        "Panel Dress": "Dresses",
+        "Short Dress": "Dresses"
+      },
+      "Abaya": {
+        "Reversible Abaya": "Abayas",
+        "Abaya": "Abayas"
+      },
+      "Jalabiya": {
+        "Jalabiya": "Jalabiyas"
+      }
+    },
+    "second_slot_sell_through": 0.5,
+    "second_slot_family_share": 0.4,
+    "_second_slot_note": "A liked silhouette gets a second slot (a second version) when it sold through more than half its stock, or, where stock isn't tracked (abayas), when it made up at least 40% of its family's sales. Otherwise one slot each; the rest stay open."
+  },
+  "_ops_about": "When ops.json (from the PRNTCODE Ops App, Supabase project PRNTCODE-ops) is in the data folder, its collections and product-to-collection links override the 'collections' list above."
+}
