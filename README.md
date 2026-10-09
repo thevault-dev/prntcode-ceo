@@ -1,8 +1,8 @@
 # PRNTCODE CEO agent
 
-![PRNTCODE CEO agent org chart: CEO router at the top, the live Chief of Staff feeding the Coordinator ledger, Legal live on Anthropic's legal plugin, Operations, Marketing and Sales partly live, and three charter-only departments](docs/org-chart.svg)
+![PRNTCODE CEO agent org chart: CEO router at the top, the live Chief of Staff feeding the Coordinator ledger, Legal live on Anthropic's legal plugin, Finance live, Operations, Marketing and Sales partly live, and two charter-only departments](docs/org-chart.svg)
 
-Khaled's PRNTCODE agent, **v2.2.0** (four existing skills move into the repo, 5 Oct 2026). The **CEO** is a thin router. The **Chief of Staff** is live:
+Khaled's PRNTCODE agent, **v2.3.0** (Finance goes live as Khaled's analyst, 9 Oct 2026). The **CEO** is a thin router. The **Chief of Staff** is live:
 
 - **Refresh** (`/prntcode-ceo:refresh`, **Sun and Wed 20:00 Abu Dhabi**): reads the team tracker "Get Sh\*t done!!!", decides which of *your* tasks need your time in the coming half-week, and posts them to your Coordinator ledger. Then it shows a ≤5-line PRNTCODE pre-brief, flags your tasks with no D-Day, and on Sundays links the Monday Pack. It ends with `plan Khaled's half-week`, so the Coordinator starts planning in the same chat. It replaces the daily 06:30 sync.
 - **What now** (the `what-now` skill): in a focus block, say "what do you need from me now?", "PRNTCODE focus, what's next?" or "I have 90 minutes, what should I do?". You get the 1–3 tasks that fit your time, each with its first concrete step. Reply `done` (closes it in the tracker), `next` or `skip`.
@@ -12,13 +12,15 @@ Khaled's PRNTCODE agent, **v2.2.0** (four existing skills move into the repo, 5 
 
 **Legal** is live too. It runs on Anthropic's **legal** plugin, installed from Anthropic's marketplace so it keeps updating. For any contract, NDA or legal question, the CEO reads PRNTCODE's playbook ([`org/legal/legal.local.md`](plugins/prntcode-ceo/org/legal/legal.local.md)) and hands it to the right `legal:` skill, so reviews use PRNTCODE's positions in place of the plugin's US-law defaults. Ask through the PRNTCODE agent ("PRNTCODE agent, review this contract"): called on its own in a chat, the plugin can't find the playbook. See [`org/legal/`](plugins/prntcode-ceo/org/legal/README.md).
 
+**Finance** is live (v2.3): your analyst, there to help you run PRNTCODE more profitably. Ask it any money question ("should I restock Butterfly?", "how's cash?", "can we afford the new workshop?") and you get a recommendation, the three numbers behind it, two or three options with their 30- and 90-day profit and cash impact, an affordability check, and how confident it is. It keeps an 8-week cash outlook, works out what each piece really costs and earns, and from the 1st of each month offers last month's review with three yes/no decisions. **It never messages you on its own schedule**: it shows one status line in your PRNTCODE blocks, and when something needs you it asks planning for time through the Sun/Wed refresh. Zoho keeps the books; Finance reads Zoho, Shopify and the Ops App and writes only to its own Notion page. See [Finance](#finance) below and [`org/finance/`](plugins/prntcode-ceo/org/finance/README.md).
+
 **Operations, Marketing and Sales are partly live**: each runs one skill from this repo, and the rest of its charter is still to build.
 
 - **Operations** · `prntcode-catalogue-review`: the monthly Shopify tag, variant and collection audit, and the Lumi's Favs rotation. Writes to Shopify only after you approve.
 - **Marketing** · `prntcode-brand-formatter`: puts anything that leaves the company into the PRNTCODE brand.
 - **Sales** · `prntcode-pricing`: prices a collection from its costing sheet, with competitor benchmarks and a branded Excel model.
 
-Strategy, Finance and the Auditor have a charter only. See [`plugins/prntcode-ceo/org/`](plugins/prntcode-ceo/org/README.md).
+Strategy and the Auditor have a charter only. See [`plugins/prntcode-ceo/org/`](plugins/prntcode-ceo/org/README.md).
 
 ## The loop
 
@@ -50,7 +52,7 @@ On a laptop, in **claude.ai**:
 4. Paste `thevault-dev/prntcode-ceo` and confirm.
 5. Turn **Sync automatically** **on**. Updates then arrive by themselves.
 6. Find **prntcode-ceo** in the list and click **Install**.
-7. Check it worked: start a new chat, type `/prntcode-ceo:` and you should see **refresh**, **what-now**, **close-task**, **monday-pack**, **meeting-tasks**, **prntcode-catalogue-review**, **prntcode-brand-formatter**, **prntcode-pricing**, **ceo** and the retired **sync** stub.
+7. Check it worked: start a new chat, type `/prntcode-ceo:` and you should see **refresh**, **what-now**, **close-task**, **monday-pack**, **meeting-tasks**, **ask-finance**, **cash-outlook**, **unit-economics**, **monthly-review**, **prntcode-catalogue-review**, **prntcode-brand-formatter**, **prntcode-pricing**, **ceo** and the retired **sync** stub.
 8. For Legal, also install Anthropic's **legal** plugin from the same Plugins tab. Type `/legal:` in a new chat to check it's there.
 
 **Turn off the old standalone copies** so two versions don't compete. In **Customize → Skills** (or **Customize → Plugins**, wherever each one shows up), switch these **off**:
@@ -72,6 +74,11 @@ Both are in **Customize → Connectors**.
 1. Click **Supabase → Connect** and sign in with the account that owns the **coordinator** project.
 2. Allow access to the organization that holds the **coordinator** project.
 3. Make sure the toggle is **on**.
+
+**For Finance (v2.3), also:**
+- **Zoho Books**: connect and allow the organisation **Prntcode**. Finance only reads.
+- **Shopify**: connect the PRNTCODE store. Finance only reads orders and analytics.
+- **Supabase**: the same connector must also reach the **PRNTCODE-ops** project (the Ops App), read-only.
 
 Quick test: in a new chat, type **"sync my PRNTCODE time"**. If a connector is missing, the agent names it and writes nothing.
 
@@ -106,6 +113,7 @@ The run stops at the Coordinator's "Anything else booked?" and waits for your re
 | `brand this` · `put this in PRNTCODE format` | Marketing's brand formatter |
 | `price this collection` + a costing sheet | Sales' pricing model: RRP, wholesale, margins, benchmarks, branded Excel |
 | `PRNTCODE agent, review this contract` · `can we sign this NDA?` · `can PRNTCODE run this promotion?` | The CEO loads the Legal playbook and hands over to the right `legal:` skill. Sections still marked `_TBD_` are flagged in the first line |
+| `how's cash?` · `can we afford AED X by 30 Oct?` · `should I restock Butterfly?` · `September review` | Finance (see [Finance](#finance)) |
 | `drop X` (after a sync lists a booked block you no longer need) | Say it to your **Coordinator**, which owns the calendar. The PRNTCODE agent can't remove booked blocks. |
 
 ### What the v1 sync summary looked like (now `show details` after a refresh)
@@ -224,6 +232,8 @@ Coordinator ledger: Supabase project `coordinator` (`hgkreprqxevayruqpibf`), tab
 
 On conflict, it only ever changes `title` and `due_by`, and only when one of them actually changed and the row is `new`, `proposed` or `scheduled`.
 
+The refresh's Finance check (v2.3) uses the same upsert for at most one row per half-week, with `sub_agent = finance` and `source_ref = finance:<half-week start date>` (see [Finance rows in the ledger](#finance-rows-in-the-ledger)).
+
 **2. `public.agent_withdraw(p_source_agent, p_source_ref, p_reason)`**: moves a `new` or `proposed` row to `declined` with the note `withdrawn by prntcode: <reason>`. It refuses `scheduled` rows and rows it can't find, and is granted to `service_role` only.
 
 **3. `public.agent_mark_tracker_closed(p_request_id)`**: stamps `tracker_closed_at = now()` after close-task closed the Notion task. Refuses rows that aren't `prntcode`'s and missing rows; calling it twice is harmless. It doesn't bump `updated_at`, so a stamped row never shows as "changed" in the digest. Migration `20261003081504 close_task_resolution`, which also adds `resolution` (`done_elsewhere` | `not_needed`, set by the Coordinator).
@@ -239,6 +249,50 @@ It never writes the bottom half (`status`, `slot_*`, `calendar_event_id`, `decis
 [`tests/prntcode_contract_check.sql`](tests/prntcode_contract_check.sql) proves the contract end to end, with first post, zero-write re-run, due-date-only update, withdraw, and both refusals. It rolls itself back, so it never leaves a row behind.
 To run it: **Supabase → coordinator → SQL Editor → New query →** paste the file **→ Run**. The result should read `ALL PRNTCODE CONTRACT CHECKS PASSED`.
 
+[`tests/finance_ledger_check.sql`](tests/finance_ledger_check.sql) does the same for the refresh's Finance row (one post, a zero-write re-run, title-only update, the withdraw sweep and close-task leaving it alone, withdraw when nothing is pending). It should read `ALL FINANCE LEDGER CHECKS PASSED`.
+
+## Finance
+
+Finance answers when you ask, in chat. It never sends you anything on a timer.
+
+### Usage
+
+| Say | What you get |
+|---|---|
+| `set up Finance` | Once: checks its Notion page, lists the costs to enter (ranked by the revenue they touch), asks for your cash floor, atelier cost, standard minutes and fee rates, then the bill triage |
+| `how's cash?` | The 8-week outlook in 8 lines or fewer: status, low point, opening cash, biggest outgoings. Then `show weeks` (both lines, week by week) or `show details` (every item and every excluded deposit) |
+| `rent AED 7,500 monthly on the 1st` · `cancel the rent` · `what's coming up?` | Commitments by chat. Each add, change or cancel is confirmed in one line first |
+| `owed 1 3, paid 2` | Your answer to the bill triage list. Zoho isn't changed |
+| `should I restock Butterfly?` · `should I mark down Checkered Orchid?` · `is the Vibey pop-up worth it at a AED 2,000 stall fee?` · `what ROAS do we need?` · `quote floor for 50 scarves` · `should we hire a second tailor?` | The five-part answer: recommendation, 3 numbers, options with 30/90-day profit and cash, can we afford it, confidence. Reply `go` (or `go B`) to make the spend a commitment, or `no` |
+| `can we afford AED 30,000 by 30 Oct?` | The funding check alone: GREEN, AMBER or RED and the new low point; if not GREEN, the most that fits by then, the earliest date the full amount fits, and a split |
+| `what does JGLEDT-ABY-BTF-TER-L cost us?` · `which costs are missing?` | Materials × quantity × cost, full and extra cost, profit per piece by channel; or the gap list |
+| `September review` (or pick it in a PRNTCODE block) | The branded review artifact and three yes/no decisions. Reply `yes 1, no 2, yes 3` |
+| `set cash floor AED 20,000` · `atelier cost AED 9,000 a month` | Changes a setting, after a one-line confirmation |
+
+(Example amounts are made up.)
+
+**Where it shows up without you asking:** one line in the CEO opener (`Finance: Cash GREEN · low AED X, week of 16 Nov`), Finance picks among the opener's 1–3 when cash is AMBER or RED, the review is due or a decision is waiting, and on Sun and Wed one time request to planning plus one pre-brief line when any of those holds.
+
+### How it decides
+
+- **Opening cash** is the bank-feed balance of the LLC Wio account only. If Zoho's book balance differs by more than the tolerance (default AED 1,000), you see both and the number of uncategorised transactions.
+- **Money out:** commitments you logged (recurring ones repeated), open Ops App purchase orders, Zoho bills you said are still owed (counted once), and ad spend at the last 4 weeks' rate. **Money in:** open Zoho invoices, inflows you logged, and expected sales at the last 8 weeks' average of real sales deposits (Network International, Shopify, Stripe, Ziina). Owner top-ups, transfers between your own accounts and refunds are left out.
+- **Two lines a week:** committed-only and expected. **GREEN** if neither drops below your floor, **AMBER** if only the committed-only line does, **RED** if the expected line does.
+- **Costs** come from the Ops App (entered in the reference sheet's inputs tab). Each product has a **full cost** (materials + its share of the salaried atelier by standard minutes + trims and packaging; for pricing and the review) and an **extra cost** (materials only; for restock, B2B and markdown decisions while the atelier has spare capacity). A missing cost is shown as `cost missing` with its share of revenue. Never guessed.
+- **Track record:** every answer goes in the decision log with its predicted 30- and 90-day impact. The monthly review compares them with what happened and shows the hit rate and the biggest miss.
+
+### Operations handoff (wired later)
+
+Operations sends `funding check <source_ref>: <amount> <currency> due <YYYY-MM-DD> for <what>` and gets back exactly one line: `Funded: …`, `Funded, tight: …` or `Not funded: … — max <amount> by <date>, or full amount from <date>`.
+
+### Where the numbers live
+
+Only in the Notion page **Finance** (Trackers & Tings → Finance): Settings, Commitments, Bill answers, Decision log, Monthly reviews. **This repo is public**, so no real amount, balance, floor, fee rate, salary or account number is ever committed; examples are made up.
+
+### Finance rows in the ledger
+
+The refresh posts at most one Finance row per half-week (`source_agent = prntcode`, `sub_agent = finance`, `source_ref = finance:<half-week start date>`, e.g. title `Finance decisions — cash AMBER, 2 to decide`, `Est. 60m`). A second run writes nothing; when nothing is pending, the row is withdrawn. The refresh's withdraw sweep never treats a Finance row as "missing from the tracker", and `done` on one from planning replies `Finance item closed — nothing in the tracker`.
+
 ---
 
 ## What's in this repo
@@ -250,29 +304,37 @@ plugins/prntcode-ceo/
   skills/
     ceo/                               CEO: thin router (also hands legal asks to Anthropic's legal plugin)
     refresh/                           Chief of Staff: Sun + Wed half-week refresh → ledger (+ close-task safety net)
-    what-now/                          Chief of Staff: 1–3 tasks for a focus block
+    what-now/                          Chief of Staff / CEO opener: Finance status line + 1–3 picks for a focus block
     close-task/                        Chief of Staff: close one tracker task from the digest
     monday-pack/                       Chief of Staff: Monday Pack (+ Your time asks)
     meeting-tasks/                     Chief of Staff: Fellow action items → tracker, after a confirmation table
+    ask-finance/                       Finance: the analyst (five-part answer, funding check, Operations line)
+    cash-outlook/                      Finance: 8-week cash outlook, bill triage, commitments by chat
+    unit-economics/                    Finance: full and extra cost, contribution per piece, cost gap list
+    monthly-review/                    Finance: last month's review + track record + 3 decisions (branded artifact)
     prntcode-catalogue-review/         Operations: monthly Shopify catalogue audit (+ GraphQL recipes)
     prntcode-brand-formatter/          Marketing: PRNTCODE visual brand (+ logos and grid assets)
     prntcode-pricing/                  Sales: collection pricing model (+ input template, competitor list)
     sync/                              retired daily sync (stub)
   org/                                 one charter README per role (9)
     legal/legal.local.md               PRNTCODE's legal playbook, read by the CEO before any legal: skill
+    finance/finance-reference.md       Finance's shared IDs, settings and rules (no real numbers)
 docs/org-chart.svg                     the chart above
 docs/coordinator-handoff.md            what the coordinator repo needs
+docs/verification-2026-10-09-finance.md  Finance v1 checks (made-up numbers only)
 tests/prntcode_contract_check.sql      ledger contract self-test
+tests/finance_ledger_check.sql         Finance row self-test (rolls itself back)
 ```
 
 ## Not built yet
 
-Guess-accuracy tracking (planned for the Auditor), reopening declined items when the due date moves, Legal's own PRNTCODE skills (IP register, infringement and trademark watch, redline and renewal tracking), Strategy, Finance and the Auditor, and the planned parts of Operations, Marketing and Sales (late order and resupply alerts, attribution, contact cadence, line sheets and the wholesale pipeline, among others).
+Guess-accuracy tracking (planned for the Auditor), reopening declined items when the due date moves, Legal's own PRNTCODE skills (IP register, infringement and trademark watch, redline and renewal tracking), Finance's nice-to-haves (collection budgets, an overhead review, a daily RED-within-7-days cash check once the Coordinator's daily brief exists, Stripe payouts), Strategy and the Auditor, and the planned parts of Operations, Marketing and Sales (late order and resupply alerts, attribution, contact cadence, line sheets and the wholesale pipeline, among others).
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---|---|
+| Finance says "Zoho not connected" or "cost missing" everywhere | Connect Zoho Books (section 2). "Cost missing" is expected until costs are entered in the reference sheet's inputs tab: say `which costs are missing?` for the ranked list. |
 | `/prntcode-ceo:refresh` doesn't appear | Customize → Plugins → check **prntcode-ceo** is installed and on. Then start a **new** chat. |
 | "Notion connector missing" / "Supabase connector missing" | Section 2 above. |
 | The Monday Pack shows twice, or the old version runs | Turn off the standalone **monday-pack** skill (section 1). |
@@ -280,4 +342,4 @@ Guess-accuracy tracking (planned for the Auditor), reopening declined items when
 | A legal review says it used generic or US-law standards | Either you called a `legal:` skill directly (ask through the PRNTCODE agent instead), or the section it needed is still `_TBD_` in [`legal.local.md`](plugins/prntcode-ceo/org/legal/legal.local.md). |
 | A task you need time for was "No block needed" | Add a word to the task title or Notes that makes it clear you must do it ("review…", "decide…", "write…"). The next sync re-judges it. |
 
-**Version:** 2.2.0 (meeting-tasks, prntcode-catalogue-review, prntcode-brand-formatter and prntcode-pricing move into the repo unchanged; Marketing's charter follows the 2 Oct review). 2.1.0 made Legal live: the CEO routes legal asks to Anthropic's legal plugin with PRNTCODE's playbook. 2.0.0 brought the half-week refresh with handoff to Coordinator planning, what-now and the Monday Pack as an artifact; the daily sync is retired. The refresh keeps every v1 sync rule below; what changed is when it runs, the 'this half-week' filter (3f-bis), and the message it ends with.
+**Version:** 2.3.0 (Finance live: `unit-economics`, `ask-finance`, `cash-outlook` and `monthly-review`; `ceo` routes money questions to Finance, `what-now` shows the Finance status line and ranks Finance items among its picks, `refresh` runs a silent Finance check, and the withdraw sweep and `close-task` leave Finance rows alone). 2.2.0 (meeting-tasks, prntcode-catalogue-review, prntcode-brand-formatter and prntcode-pricing move into the repo unchanged; Marketing's charter follows the 2 Oct review). 2.1.0 made Legal live: the CEO routes legal asks to Anthropic's legal plugin with PRNTCODE's playbook. 2.0.0 brought the half-week refresh with handoff to Coordinator planning, what-now and the Monday Pack as an artifact; the daily sync is retired. The refresh keeps every v1 sync rule below; what changed is when it runs, the 'this half-week' filter (3f-bis), and the message it ends with.

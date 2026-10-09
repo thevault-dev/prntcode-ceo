@@ -1,6 +1,6 @@
 ---
 name: close-task
-description: Chief of Staff closes ONE task in the PRNTCODE Notion tracker "Get Sh*t done!!!" because Khaled said it's done or no longer needed, either to the Coordinator (planning chat or old digest) or in the "what now" skill ("done"). Use when the message is the handoff "close PRNTCODE task <source_ref> as <done|not_needed>: <reason>", when the Coordinator hands over a PRNTCODE ledger item Khaled marked done or not needed, or when Khaled says "close PRNTCODE task X — not needed / done". Sets the task's status, adds one comment, stamps the ledger, and replies in one line. Never edits any other task. Also used by /prntcode-ceo:sync as its safety net.
+description: Chief of Staff closes ONE task in the PRNTCODE Notion tracker "Get Sh*t done!!!" because Khaled said it's done or no longer needed, either to the Coordinator (planning chat or old digest) or in the "what now" skill ("done"). Use when the message is the handoff "close PRNTCODE task <source_ref> as <done|not_needed>: <reason>", when the Coordinator hands over a PRNTCODE ledger item Khaled marked done or not needed, or when Khaled says "close PRNTCODE task X — not needed / done". Sets the task's status, adds one comment, stamps the ledger, and replies in one line. Never edits any other task. Also used by the refresh as its safety net. A Finance row from the ledger (sub_agent finance) has no tracker task: "done" on it replies "Finance item closed — nothing in the tracker".
 ---
 
 # PRNTCODE close-task: one tracker task, closed on Khaled's word
@@ -48,7 +48,7 @@ If either is missing or fails with an auth error, **stop**, write nothing, and s
 ## 1. Find the ledger request
 
 ```sql
-select id, source_ref, title, status, resolution, tracker_closed_at, decision_note
+select id, sub_agent, source_ref, title, status, resolution, tracker_closed_at, decision_note
 from public.requests
 where source_agent = 'prntcode'
   and (source_ref = $q$<ref>$q$ or id::text = $q$<ref>$q$);
@@ -56,6 +56,16 @@ where source_agent = 'prntcode'
 
 - **No row → refuse:** `Not closed: <ref> isn't one of my PRNTCODE ledger requests.` This agent only closes tasks it posted for Khaled. **Exception, `via what-now`:** no row is fine, but then the page must have Khaled (`319cf6a3-548f-4fd3-b017-0514c79713b3`) in `Assigned to` (checked in step 2). Otherwise refuse with `Not closed: <ref> isn't one of your tasks.`
 - `title` is `<Task> — <Project>`. Use the Notion title for the reply, not this.
+- **`sub_agent = 'finance'`** (a `source_ref` starting `finance:`): it's a Finance time request, not a tracker task. Don't refuse and don't touch Notion: go to **Finance rows** below.
+
+## Finance rows (no tracker task)
+
+The refresh posts one `sub_agent = 'finance'` row per half-week when Finance needs Khaled's time. When he marks it done or not needed in planning:
+1. Don't fetch or write anything in Notion.
+2. If `tracker_closed_at` is empty, stamp it (step 6), so the refresh's safety net doesn't pick it up again.
+3. Reply in one line, exactly: `Finance item closed — nothing in the tracker`
+
+The Finance work itself (cash, the review, open decisions) stays where it is; the next refresh's Finance check posts a new request if something still needs him.
 
 ## 2. Check the page is a tracker task
 
@@ -127,7 +137,7 @@ If `not_needed` fell back to Done because no Cancelled status exists, that's exp
 1. **One page per handoff:** the page named by `source_ref`. Never query-and-update, never touch a related, parent or neighbouring task, never bulk-edit.
 2. **Two Notion writes only:** the `Status` property, and one comment. No other property, no page content, no relations, no dates, no assignees.
 3. **Never create or change status options**, or any part of the tracker's schema.
-4. **Only tracker tasks with a `prntcode` ledger row.** Anything else is refused.
+4. **Only tracker tasks with a `prntcode` ledger row.** Anything else is refused, except a `sub_agent = 'finance'` row, which gets the **Finance rows** reply and a stamp, never a Notion write.
 5. **Already closed means no writes** to Notion.
 6. **Don't ask Khaled to confirm.** His reply (to the Coordinator, or "done" in what-now) is the approval.
 7. **One ledger write:** `agent_mark_tracker_closed`. Never `status`, `resolution` or the Coordinator's bottom half.
