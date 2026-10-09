@@ -5,3 +5,5 @@
 **Existing skills that map here:** none yet. First job (from the v1 nice-to-haves): **guess accuracy tracking** over the `prntcode` rows in the Coordinator ledger.
 
 **Writes:** none. Read-only by design.
+
+**Keeping Zoho correct** (uncategorised bank lines, bills shown unpaid that were paid, duplicate Shopify postings) is the Auditor's job: Finance takes Zoho as it is. Finance's own forecast accuracy is in `finance.accuracy_v`; the Auditor reads it, not rebuilds it.
