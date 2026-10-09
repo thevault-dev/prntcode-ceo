@@ -6,4 +6,4 @@
 
 **Writes:** none. Read-only by design.
 
-**Finance's own scorecard** (hit rate and biggest miss on the Finance decision log) is already produced by Finance's monthly review; the Auditor will read it, not rebuild it.
+**Keeping Zoho correct** (uncategorised bank lines, bills shown unpaid that were paid, duplicate Shopify postings) is the Auditor's job: Finance takes Zoho as it is. Finance's own forecast accuracy is in `finance.accuracy_v`; the Auditor reads it, not rebuilds it.

@@ -65,7 +65,7 @@ The refresh posts one `sub_agent = 'finance'` row per half-week when Finance nee
 2. If `tracker_closed_at` is empty, stamp it (step 6), so the refresh's safety net doesn't pick it up again.
 3. Reply in one line, exactly: `Finance item closed — nothing in the tracker`
 
-The Finance work itself (cash, the review, open decisions) stays where it is; the next refresh's Finance check posts a new request if something still needs him.
+The Finance work itself (the monthly review, PO verdicts) stays where it is; the next refresh's Finance check posts a new request if something still needs him.
 
 ## 2. Check the page is a tracker task
 

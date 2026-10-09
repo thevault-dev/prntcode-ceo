@@ -5,14 +5,14 @@
     "email": "thevault@prntcode.com"
   },
   "metadata": {
-    "description": "Khaled's PRNTCODE agent: a CEO router with a live Chief of Staff that feeds the Coordinator ledger and runs the Monday Pack, Finance as Khaled's analyst, Legal on Anthropic's legal plugin, and the first Operations, Marketing and Sales skills.",
+    "description": "Khaled's PRNTCODE agent: a CEO router with a live Chief of Staff that feeds the Coordinator ledger and runs the Monday Pack, Finance (forecast, scenarios, PO checks, capital review), Legal on Anthropic's legal plugin, and the first Operations, Marketing and Sales skills.",
     "version": "2.3.0"
   },
   "plugins": [
     {
       "name": "prntcode-ceo",
       "source": "./plugins/prntcode-ceo",
-      "description": "PRNTCODE CEO agent: a half-week refresh (Sun and Wed 20:00) that posts Khaled's PRNTCODE time needs to the Coordinator ledger and hands over to Coordinator planning; 'what now' for focus blocks; close-task; meeting-tasks; the Monday Pack; Finance, Khaled's analyst (ask-finance, an 8-week cash outlook, unit economics and a monthly review with a track record); Legal on Anthropic's legal plugin with PRNTCODE's playbook; and the first department skills: catalogue review (Operations), brand formatter (Marketing) and pricing (Sales).",
+      "description": "PRNTCODE CEO agent: a half-week refresh (Sun and Wed 20:00) that posts Khaled's PRNTCODE time needs to the Coordinator ledger and hands over to Coordinator planning; 'what now' for focus blocks; close-task; meeting-tasks; the Monday Pack; Finance (a 12-month forecast, scenarios, PO checks, a monthly capital efficiency review and one silent daily run); Legal on Anthropic's legal plugin with PRNTCODE's playbook; and the first department skills: catalogue review (Operations), brand formatter (Marketing) and pricing (Sales).",
       "version": "2.3.0",
       "category": "productivity"
     }

@@ -1,6 +1,6 @@
 ---
 name: refresh
-description: The PRNTCODE half-week refresh (Chief of Staff), run on Sunday and Wednesday at 20:00 Abu Dhabi. Reads Khaled's tasks in the Notion tracker "Get Sh*t done!!!", decides which need his own time in the coming half-week, posts, updates or withdraws them in the Coordinator ledger (top half only), closes tasks he already closed from the Coordinator (safety net), shows a 5-line PRNTCODE pre-brief, flags his tasks with no D-Day, runs a silent Finance check (one time request to the ledger and one pre-brief line when cash is AMBER or RED, a monthly review is due or Finance decisions are waiting), and on Sundays links the Monday Pack as its own artifact. It ends by handing over to the Coordinator with the line "plan Khaled's half-week", so planning starts in the same chat. Use it for "/prntcode-ceo:refresh", "refresh PRNTCODE", "PRNTCODE refresh", "run the half-week refresh", "sync my PRNTCODE time", "what PRNTCODE time do I need". Never writes to any calendar; writes to Notion only through the close-task safety net.
+description: The PRNTCODE half-week refresh (Chief of Staff), run on Sunday and Wednesday at 20:00 Abu Dhabi. Reads Khaled's tasks in the Notion tracker "Get Sh*t done!!!", decides which need his own time in the coming half-week, posts, updates or withdraws them in the Coordinator ledger (top half only), closes tasks he already closed from the Coordinator (safety net), shows a 5-line PRNTCODE pre-brief, flags his tasks with no D-Day, runs a silent Finance check (one time request when the monthly capital review is unopened or a non-"go" PO verdict is undecided, withdrawn once nothing is pending), and on Sundays links the Monday Pack as its own artifact. It ends by handing over to the Coordinator with the line "plan Khaled's half-week", so planning starts in the same chat. Use it for "/prntcode-ceo:refresh", "refresh PRNTCODE", "PRNTCODE refresh", "run the half-week refresh", "sync my PRNTCODE time", "what PRNTCODE time do I need". Never writes to any calendar; writes to Notion only through the close-task safety net.
 ---
 
 # PRNTCODE half-week refresh: Notion → Coordinator ledger → planning
@@ -220,7 +220,7 @@ Its rules hold here too: one page per row, only `Status` + one comment, already-
 
 ## 6. Withdraw on change
 
-Take every ledger row with status `new`, `proposed` or `scheduled` whose `source_ref` is **not** among this run's candidates (1a), **whose `resolution` is null, and whose `sub_agent` is not `finance`**. Finance rows (`sub_agent = 'finance'`, `source_ref` starting `finance:`) aren't Notion tasks: they are never "missing from the tracker", are never fetched from Notion, and are withdrawn only by step 6b. A row with `resolution` set was closed from the digest; its status belongs to the Coordinator, so it's never withdrawn here. For each one, `notion-fetch` the page (the source_ref works as an ID) to find out why:
+Take every ledger row with status `new`, `proposed` or `scheduled` whose `source_ref` is **not** among this run's candidates (1a), **whose `resolution` is null, and whose `sub_agent` is not `finance`**. Finance rows (`sub_agent = 'finance'`, `source_ref` starting `finance:`) aren't Notion tasks: they're never "missing from the tracker", never fetched from Notion, and only step 6b posts or withdraws them. A row with `resolution` set was closed from the digest; its status belongs to the Coordinator, so it's never withdrawn here. For each one, `notion-fetch` the page (the source_ref works as an ID) to find out why:
 
 | Fetch shows | Reason |
 |---|---|
@@ -238,44 +238,48 @@ Then:
 
 ## 6b. Finance check (silent)
 
-Finance never messages Khaled on its own schedule; this check is how it reaches planning. Read `../../org/finance/finance-reference.md`, then, all read-only:
+Finance reaches planning only through this step. Read `../../org/finance/finance-reference.md`, then, all read-only (Ops project `nhimagmpcwlkbfygiowq`):
 
-1. **Cash:** the `cash-outlook` skill's status (its step 6, "Called by another skill").
-2. **Review due:** the previous month's review is due while the Finance **Monthly reviews** data source (`collection://6a13f42d-f158-4e3b-bf4c-a00e4562c40e`) has no `Status = done` row for it.
-3. **Decisions waiting:** decision-log rows (`collection://414e0fe0-528a-4eec-a175-fbad713b915b`) with `Answer = pending`.
+```sql
+select
+  (select count(*) from finance.reviews where opened_at is null)                                  as reviews_unopened,
+  (select max(month) from finance.reviews where opened_at is null)                                as review_month,
+  (select count(*) from finance.po_latest_check_v c join public.purchase_orders po on po.po_number = c.po_number
+    where c.verdict <> 'go' and po.status = 'draft')                                              as pos_undecided;
+```
 
-If a Finance read fails (Zoho, Notion or the Ops App unreachable), write nothing for Finance, add `Finance: couldn't check (<why>)` as the pre-brief line, and carry on. A failed read never withdraws the Finance row.
+If the read fails, write nothing for Finance and add `Finance: couldn't check (<why>)` to the pre-brief. A failed read never withdraws the Finance row.
 
-**Something needs him** when cash is **AMBER** or **RED**, a review is due, or at least one decision is waiting. Then post **one** time request through the same upsert as step 5 (top half only):
+**Something is pending** when a review is unopened or at least one non-`go` PO is undecided. Then post **one** time request through the same upsert as step 5 (top half only):
 
 | Column | Value |
 |---|---|
 | `source_agent` / `sub_agent` | `prntcode` / `finance` |
 | `source_ref` | `finance:<half-week start date>`, e.g. `finance:2026-10-12` (the Monday or Thursday that starts the coming half-week) |
-| `title` | `Finance decisions — <parts>`, parts from: `cash AMBER` / `cash RED`, `<n> to decide`, `<Month> review`, joined with `, ` (e.g. `Finance decisions — cash AMBER, 2 to decide`) |
-| `context` | `Est. <N>m: <what for>` (e.g. `Est. 60m: cash AMBER + 2 Finance decisions`) |
-| `duration_min` | 20m for cash AMBER/RED, 20m for a review, 10m per decision; summed and rounded **up** to 30, 60, 90 or 120 |
-| `earliest_start` | `now()` |
-| `due_by` | `HW_END` (19:59:00Z on the half-week's last day) |
-| `flexibility` / `priority` | `flexible` / `1` if cash RED, `2` if AMBER, else `3` |
+| `title` | `Finance — <parts>`, from `monthly review` and `<n> PO(s)`, joined with ` + ` (e.g. `Finance — monthly review + 1 PO`) |
+| `context` | `Est. <N>m: <what for>` (e.g. `Est. 45m: capital review + PO 0012 verdict`) |
+| `duration_min` | 30 for the review + 15 per PO, capped at 120 (review + 1 PO = **45**, matching `Est. 45m`). Finance rows don't use the tasks' 30-minute steps. |
+| `earliest_start` / `due_by` | `now()` / `HW_END` (19:59:00Z on the half-week's last day) |
+| `flexibility` / `priority` | `flexible` / `2` if a PO is due before `HW_END`, else `3` |
 
-The step-5 conflict clause applies unchanged: an unchanged row isn't touched, so **a second run writes nothing**; a changed title (say, one more decision) updates the title only. Duration, priority and context are never re-guessed.
+The step-5 conflict clause applies unchanged, so **a re-run writes nothing**; a changed title updates the title only.
 
-**Withdraw when nothing is pending.** Read the open Finance rows:
+**Withdraw when nothing is pending.**
 ```sql
 select source_ref, status from public.requests
 where source_agent = 'prntcode' and sub_agent = 'finance' and status in ('new', 'proposed', 'scheduled') and resolution is null;
 ```
-- If nothing needs him: each `new`/`proposed` one → `agent_withdraw('prntcode', <source_ref>, $q$nothing pending in Finance$q$)`.
-- A `new`/`proposed` row for an **earlier** half-week (its `source_ref` date is before this half-week's start) → `agent_withdraw(…, $q$replaced by finance:<this half-week start>$q$)`, so only one Finance request is ever open.
-- A `scheduled` Finance row is left alone (as in step 6): the block is booked and Khaled uses it.
-- A Finance row withdrawn earlier in the same half-week isn't reposted (the upsert never reopens a declined row); if something needs him again, it comes back with the next half-week's `source_ref`.
+(on the ledger project `hgkreprqxevayruqpibf`)
+- Nothing pending: each `new`/`proposed` one → `agent_withdraw('prntcode', <source_ref>, $q$nothing pending in Finance$q$)`. So once the review is opened (and no PO waits), the request is withdrawn.
+- A `new`/`proposed` row for an **earlier** half-week → `agent_withdraw(…, $q$replaced by finance:<this half-week start>$q$)`, so only one Finance request is open.
+- A `scheduled` Finance row is left alone (as in step 6).
+- A Finance row withdrawn earlier in the same half-week isn't reposted (the upsert never reopens a declined row); it comes back with the next half-week's `source_ref` if still needed.
 
-**One pre-brief line** whenever something needs him (or the read failed):
+**One pre-brief line** when something is pending:
 ```
-Finance: cash AMBER · low AED 6,200, week of 16 Nov · 2 to decide · September review due
+Finance: September review unopened · PO 0012 go smaller (60 pcs)
 ```
-No Finance line when nothing needs him. Finance rows count in the `Ledger:` line like any other (`posted`, `withdrawn`).
+No Finance line when nothing is pending. Finance rows count in the `Ledger:` line like any other.
 
 ## 7. The message (always, phone-readable)
 
@@ -298,7 +302,7 @@ Name who's waiting: `Hessa waits on: freelancer decision (Admin)`. At most 2.
 - If this runtime can't make artifacts, save it as the archive page `Monday Pack — YYYY-MM-DD` under **Monday Packs** (monday-pack step 7, with its snapshot toggle) and link that Notion page instead.
 - Execute none of its proposals. Khaled approves them later by replying in this chat, e.g. `pack 1, 2` (monday-pack step 6).
 
-**The message: exactly this shape.** The first five lines are the pre-brief; the Finance line (step 6b) follows them only when something needs him. Leave out a line that would be empty.
+**The message: exactly this shape.** The first five lines are the pre-brief; the Finance line (step 6b) follows them only when something is pending. Leave out a line that would be empty.
 
 ```
 **PRNTCODE · Sun 4 Oct → Mon–Wed**
@@ -307,7 +311,7 @@ Waiting on you: Hessa — freelancer decision (Admin)
 D-Days: Cactus District R2 Fri 16 Oct · House Launch Sat 31 Oct
 Ledger: 2 posted · 1 updated · 1 withdrawn · 1 closed · 6h open for you
 No D-Day: Brainstorm launch ideas · Projectors — set one in Notion so alerts work
-Finance: cash AMBER · low AED 6,200, week of 16 Nov · 2 to decide
+Finance: September review unopened · PO 0012 go smaller (60 pcs)
 Monday Pack: <link>
 ```
 
@@ -343,4 +347,4 @@ This agent can't remove a booked block, because only the Coordinator writes cale
 8. A second run with no Notion changes must write **zero** rows. If you're about to write, check that a title or due date really changed.
 9. **Always end with the handoff (step 8)**, and never paste the Monday Pack into the chat.
 10. **Never change a teammate's task.** The only tracker writes are close-task's, and only on tasks Khaled closed himself.
-11. **Finance rows are not tracker tasks.** Step 6 skips `sub_agent = 'finance'` rows; only step 6b posts or withdraws them, at most one open at a time. Finance never writes to the ledger itself; this step does it for Finance.
+11. **Finance rows are not tracker tasks.** Step 6 skips `sub_agent = 'finance'` rows; only step 6b posts or withdraws them, at most one open at a time. Step 6b only reads Finance's data; it never writes to the `finance` schema.

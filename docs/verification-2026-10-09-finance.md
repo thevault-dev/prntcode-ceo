@@ -1,59 +1,43 @@
 # Finance v1 verification: 9 Oct 2026
 
-Build of `BUILD BRIEF: PRNTCODE Finance, the analyst (v1)` into prntcode-ceo **2.3.0**.
+Build of `BUILD BRIEF: PRNTCODE Finance agent (v1)` (9 Oct 2026) into prntcode-ceo **2.3.0**.
 
-**This repo is public.** This page records pass or fail and *how* each check was made, never a real amount, balance, floor, fee rate, salary or account number. Any figure shown is made up.
+**This repo is public.** This page records pass or fail and *how* each check was made, never a real amount, balance, floor, salary or account number. Any figure shown is made up.
 
 Legend: ✅ pass · ⏳ not run yet (and why) · ❌ fail
 
-All live reads were **read-only** (Zoho Books organisation Prntcode, Shopify, the Ops App `PRNTCODE-ops`). The only live writes were the Notion Finance page set-up, and one ledger test that rolled itself back.
+Live reads were **read-only** (Zoho Books organisation Prntcode, Shopify, the Ops tables, the Coordinator ledger). The only live writes: the `finance` schema migrations, and two self-tests that rolled themselves back.
 
 ## Definition of Done
 
 | # | Check | Result | How |
 |---|---|---|---|
-| 1 | After plugin sync, `/prntcode-ceo:` lists `unit-economics`, `ask-finance`, `cash-outlook`, `monthly-review` | ✅ locally · ⏳ claude.ai | `claude plugin validate` passes on the marketplace and the plugin; the four skill folders have valid frontmatter. The claude.ai plugin sync needs Khaled's account. |
-| 2 | Setup creates the Notion Finance page with settings, commitments, bill answers, decision log and monthly reviews; real numbers only there | ✅ | Created *Trackers & Tings → Finance* with its five data sources. Settings are seeded only with the brief's defaults and Zoho IDs; floor, atelier cost, minutes and fee rates are left **empty** for Khaled. |
-| 3 | No committed file holds a real amount, balance, floor, fee rate, salary or account number | ✅ | Grepped every committed file for the balances, totals and masked account numbers seen in the live reads: no hits. Examples are made up and say so. |
-| 4 | Unit economics for a named SKU shows each material × quantity × cost | ⏳ blocked on costs | The query returns each SKU's BOM lines (e.g. `JGLEDT-ABY-BTF-TER-L` → `MAKE-ABY` × 1), but **no material or product has a cost yet**, so every line reads `cost missing`. Re-run once costs are in the reference sheet. |
-| 5 | With costs missing, unit economics lists the gap ranked by revenue touched, labels the product "cost missing", writes nothing to the Ops App or sheet | ✅ | Live: 302 products, 204 with a BOM, 5 materials, 0 costs. Ranked by trailing-12-month Shopify revenue: **revenue with no SKU match** (blank or unknown SKU) is the biggest gap, then `MAKE-ABY` (Abaya stitching), then `MAKE-RTW`. Only `select` statements ran. |
-| 6 | Full cost and extra cost, labour share follows the atelier cost in Settings | ⏳ | Needs the atelier cost, minutes and standard minutes (setup step 3) and material costs. The formula reads the Settings row live on every run. |
-| 7 | "Should I restock <print>?" gives the five-part answer on one screen, with a funding check, and logs it | ⏳ | Needs costs (profit per piece) and a cash floor. Shape and logging are in `ask-finance` §4–5. |
-| 8 | A pop-up question with a made-up stall fee returns sales needed to break even | ⏳ | Needs in-person contribution margin, so costs. `pop_up_events` has no rows yet, so no past pop-ups to compare against. |
-| 9 | A deliberately unaffordable funding check → RED with max amount, earliest date and split | ⏳ | Needs the cash floor set. Method in `ask-finance` §3. |
-| 10 | No commitment until "go"; after "go" it appears in the next outlook | ⏳ | Needs a live run with Khaled. |
-| 11 | The Operations contract line returns exactly one line in one of three formats | ⏳ | Formats fixed in `ask-finance` §7; Operations isn't wired yet. |
-| 12 | Opening cash equals the LLC Wio bank-feed balance alone | ✅ | `list_bank_accounts` returns the counted account's `bank_balance` (feed) separately from its book `balance`. DEEPWEAR (cash type), Hessa Artist Wio, Petty Cash and Undeposited Funds are all present in the list and excluded by ID. |
-| 13 | Book-vs-bank gap and uncategorised count appear when the gap is over tolerance | ✅ | Live, book and bank differ by more than the AED 1,000 tolerance, and the account reports **9** uncategorised transactions, so both lines would show. |
-| 14 | Each of the 8 weekly rows shows both lines; status follows the rule | ⏳ | Needs the floor. `show weeks` format in `cash-outlook` §6. |
-| 15 | `show details` lists the 29 Sep 2026 owner contribution among excluded deposits | ✅ | Live: the 29 Sep money-in row on the counted account is `transaction_type = owner_contribution`, so the first classification rule excludes it as `owner top-up`. |
-| 16 | Bill triage lists only open bills over the threshold, records answers, doesn't ask again; Zoho unchanged | ✅ list · ⏳ answers | Live: 9 unpaid bills; after converting the two INR bills at their bill rate, 7 are over AED 1,000 and 2 are under (shown as a count). Recording answers and "don't ask again" need Khaled's reply. Only list calls ran. |
-| 17 | Test commitment "rent AED X monthly on the 1st" appears in every month in the 8 weeks, disappears once cancelled | ⏳ | Needs a live run (expansion rules in `cash-outlook` §2a, cancel in §7). |
-| 18 | September review revenue = Shopify September net sales ex-VAT, within AED 1 | ✅ source · ⏳ full review | ShopifyQL `net_sales` by `sales_channel` for 1–30 Sep sums exactly to the `WITH TOTALS` figure. See finding F1 on VAT. |
-| 19 | The review shows cost-missing share and cash tied up in stock, ends with three yes/no decisions, answers logged | ⏳ | Needs costs for anything other than "100% cost missing". |
-| 20 | A seeded decision-log entry 30+ days old shows predicted vs actual; test row removed | ⏳ | Needs a review run. |
-| 21 | `what-now` shows the Finance status line and lists the review when due | ⏳ | Wired in `what-now` §2b; needs a live PRNTCODE block. The September review counts as due from 1 Oct. |
-| 22 | A refresh with an AMBER test commitment posts exactly one `sub_agent = finance` request and one pre-brief line | ✅ ledger · ⏳ end to end | [`tests/finance_ledger_check.sql`](../tests/finance_ledger_check.sql) check 1: one Finance row. The pre-brief line is in `refresh` §6b/§7. |
-| 23 | A second refresh writes nothing; removing the test commitment withdraws the request | ✅ | Same test, checks 2 (0 rows), 3 (title-only update, estimate kept), 6 (`withdrawn by prntcode: nothing pending in Finance`), 7 (not reopened). |
-| 24 | The withdraw sweep and `close-task` leave Finance rows alone | ✅ | Same test, check 4 (the sweep's filter skips `sub_agent = finance`) and check 5 (close-task's stamp is accepted on a Finance row); `close-task` replies `Finance item closed — nothing in the tracker` and makes no Notion call. |
-| 25 | No new scheduled task; no Finance skill sends a message on its own | ✅ | No task was created. None of the four Finance skills mention a schedule, cron or push; each says it only answers. |
-| 26 | "how's cash?" and "should I mark down Checkered Orchid?" both reach Finance | ✅ | `ceo` §3d routes both (to `cash-outlook` and `ask-finance`); both phrases are in the skills' descriptions too. |
-| 27 | Charters, org table, README, plugin.json and marketplace.json updated and at 2.3.0 | ✅ | Finance charter live with its report list; org table, CEO org table, org chart, README (Usage section) and both manifests at 2.3.0. |
-| 28 | This verification doc, pass or fail per check, made-up numbers only | ✅ | This page. |
+| 1 | After plugin sync, `/prntcode-ceo:` lists `forecast`, `scenario`, `capital-review`, `po-check`, `finance-daily` | ✅ locally · ⏳ claude.ai | `claude plugin validate` passes on the marketplace and the plugin; the five skill folders have valid frontmatter. The claude.ai sync needs Khaled's account. |
+| 2 | Setup asks for the cash floor and upcoming launches, shows the recurring-cost list; answers stored only in the `finance` schema | ✅ design + storage · ⏳ live | Setup is in `finance-reference.md` → Setup and writes only via `finance.set_setting`. Storage tested (schema test check 2). Needs Khaled's answers to run live. |
+| 3 | No committed file holds a real amount, balance, floor, salary or account number | ✅ | Grepped every committed file for the balances, totals, monthly sales and masked account numbers seen in the live reads: no hits. Examples are made up and say so. |
+| 4 | "How's cash?" in ≤ 8 lines; opening cash = the LLC Wio balance alone | ✅ shape and source · ⏳ live answer | The reply template is 8 lines (`forecast` §9). Live: `list_bank_accounts` returns the counted account's `bank_balance` separately, and the other four accounts are excluded by ID. |
+| 5 | The forecast leaves the 29 Sep 2026 owner contribution and all "Shopfy" invoices out of sales | ✅ | Live: the 29 Sep money-in row on the cash account is `transaction_type = owner_contribution`, and B2C sales come from Shopify, not bank deposits, so it can't enter sales. Zoho has 41 invoices, 20 to "Shopfy" (7 overdue); `forecast` §3 filters that customer from sales and collections. |
+| 6 | A launch Khaled entered shows a bump in its month; moving it moves the bump | ✅ dry run · ⏳ live | Dry run on live Shopify history (Jun 2025 to Sep 2026): the quiet-month baseline and the Jungle Edit RTW (July) window give a positive bump, and a test launch placed in April then May carried that bump to its new month. The Ops 1 Jan abaya "launch" shows no bump, so the rule now leaves it out. Needs a launch in settings for the live check. |
+| 7 | "Hire a tailor at AED X a month from January" → base-vs-scenario chart, four numbers, verdict | ⏳ | Needs setup (floor) and the plugin in claude.ai for the artifact. Change type `cost`, the four numbers and the reply shape are in `scenario` §1–§3. |
+| 8 | Stacking changes the result; saving and comparing up to three works | ✅ storage · ⏳ live | Schema test check 4 (save, edit while draft, status changes). Stacking and comparing are in `scenario` §4. |
+| 9 | "Make it real" adds the scenario to the base; the next "how's cash?" reflects it | ✅ storage · ⏳ live | `finance.set_scenario_status(…, 'base')` tested (check 4), and a base scenario can't be edited. `forecast` §7 applies every `base` scenario. |
+| 10 | A test draft PO is checked and the verdict stored; an oversized one gets `go smaller` with quantity and AED saved; nothing written to the Ops tables | ✅ storage · ⏳ live PO | Schema test check 5: `go_smaller` without a quantity and AED saved is refused, a stored verdict is kept for an unchanged PO, and the latest-check view follows a changed PO (this found and fixed a tie-break bug, migration `…103332`). There are **no POs in Ops yet**, and making one would mean writing to an Ops table, so the live check waits for Ops' first draft. |
+| 11 | A non-`go` PO due before the next booked PRNTCODE block → exactly one brief line, sent as that day's notification | ✅ storage · ⏳ live | Schema test check 6: a second line the same day is refused. `plan_blocks` (kind, status, slot_start) exists in the Coordinator ledger as `finance-daily` §4 expects. |
+| 12 | A test commitment dropping expected cash below the floor within 14 days → one push with options; the next day's run doesn't push again | ✅ rule · ⏳ live | Schema test check 7: the first push is due; the same gap the next day isn't (and `record_push` refuses it); a bigger or sooner gap, or 7 days on, is due again; closing the episode resets it. A live push needs the floor and the scheduled task. |
+| 13 | A quiet daily run sends no notification | ✅ design · ⏳ live | `finance-daily` §7 sends nothing on a quiet run; the build report says to switch off the task's own completion notification. |
+| 14 | A run dated the 3rd saves a snapshot, shows forecast vs actual, delivers the capital review artifact (≤ 5 ranked suggestions with AED, evidence, "simulate it") | ✅ storage · ⏳ live | Schema test checks 3 and 8: one snapshot a month (a second save keeps the first), scoring, reviews stored unopened. Needs a run on the 3rd. |
+| 15 | `what-now` shows the Finance status line and lists the review until opened | ⏳ | Wired in `what-now` §2b (reads `finance.reviews.opened_at`); needs a live PRNTCODE block. |
+| 16 | With the review unopened, `refresh` posts exactly one `sub_agent = finance` request; a re-run posts nothing; it's withdrawn once the review is opened | ✅ ledger | [`tests/finance_ledger_check.sql`](../tests/finance_ledger_check.sql): one post (`Finance — monthly review + 1 PO`, 45 min), 0 rows on re-run, title-only update, withdraw with `nothing pending in Finance`, no reopening. Result: `ALL FINANCE LEDGER CHECKS PASSED`, no rows left behind. |
+| 17 | The withdraw sweep and `close-task` leave Finance rows alone | ✅ | Same test, check 4 (the sweep's filter skips `sub_agent = finance`) and check 5 (close-task's stamp is accepted); `close-task` replies `Finance item closed — nothing in the tracker` with no Notion call. |
+| 18 | "What if we take a workshop at AED 8k a month?" reaches `scenario` | ✅ | `ceo` §3d routes "what if…" (this exact example) to `scenario`; it's also in `scenario`'s description. |
+| 19 | The scheduled task's name, time and prompt are in the build report | ✅ | [`BUILD_REPORT_FINANCE.md`](../BUILD_REPORT_FINANCE.md#the-scheduled-task). |
+| 20 | Charters, org table, README, plugin.json, marketplace.json updated; brief-line contract documented | ✅ | Finance charter live with its schedule; org table, CEO org table and org chart; README (Usage, When it reaches you, [Brief-line contract](../README.md#brief-line-contract)); both manifests at 2.3.0. |
+| 21 | This verification doc, pass or fail per check, made-up numbers only | ✅ | This page. |
 
-**Ledger test result** (Supabase `coordinator`, run 9 Oct 2026): `ALL FINANCE LEDGER CHECKS PASSED`; afterwards `count(*) where source_ref like 'finance:%'` = 0, so nothing was left behind.
+**Self-test results (9 Oct 2026):**
+- [`tests/finance_schema_check.sql`](../tests/finance_schema_check.sql) on PRNTCODE-ops: `ALL FINANCE SCHEMA CHECKS PASSED` (the first run failed check 5, the latest-check tie-break; fixed by migration `20261009103332`, then passed). Rolled back.
+- [`tests/finance_ledger_check.sql`](../tests/finance_ledger_check.sql) on coordinator: `ALL FINANCE LEDGER CHECKS PASSED`. Rolled back; `count(*) where source_ref like 'finance:%'` = 0 afterwards.
 
-## Findings for Khaled
+## Next checks once it's live
 
-- **F1. VAT is added at checkout, not included in prices.** The brief says prices include VAT. On 9 Oct every September order had `taxesIncluded = false`: VAT is added on top for UAE orders and zero-rated for orders shipped abroad. The skills therefore take revenue from Shopify's `net_sales`, which is already ex-VAT, and never divide by 1.05 (which would understate revenue by about 5%).
-- **F2. Online card payouts arrive from Ziina**, often uncategorised, with no deposits named Shopify or Stripe. Ziina is added to `operating_deposit_payers` in Settings so the sales run-rate counts it. Confirm or remove it.
-- **F3. The biggest cost gap is revenue with no SKU match.** A large share of the last 12 months' Shopify revenue sits on lines with a blank SKU, plus a few SKUs the Ops App doesn't know (e.g. `JGLEDTABY-…`, missing a dash). Those lines can't be costed until Shopify SKUs match the Ops App.
-- **F4. The BOMs only hold "making" lines.** Every BOM line is one of the four `MAKE-*` materials × 1. Fabric, trims and packaging aren't in the materials list yet, so even after making costs are entered, full cost will be understated until they're added.
-- **F5. `purchase_orders` and `pop_up_events` are empty**, so the outlook has no PO outflows yet and pop-up questions have no history to compare against.
-- **F6. Bill triage will matter.** Several recurring bills show as unpaid for up to three months; per the brief's note they may already be paid. The first triage settles which ones count.
-
-## Next steps for Khaled (in chat, after the plugin syncs)
-
-1. `set up Finance`: answer the four settings questions (floor, atelier cost and minutes, standard minutes per type, fee rates), then the bill triage.
-2. Enter making, fabric, trims and packaging costs in the reference sheet's inputs tab, and fix the unmatched Shopify SKUs.
-3. Then re-run checks 4, 6–11, 14, 17 and 19–21 and update this page.
+After the plugin syncs and `set up Finance` is done: re-run checks 2, 4, 6–9, 12–15 in chat, and 10–11 when Ops raises its first draft PO. Update this page with the results.
