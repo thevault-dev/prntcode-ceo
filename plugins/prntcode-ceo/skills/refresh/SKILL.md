@@ -1,6 +1,6 @@
 ---
 name: refresh
-description: The PRNTCODE half-week refresh (Chief of Staff), run on Sunday and Wednesday at 20:00 Abu Dhabi. Reads Khaled's tasks in the Notion tracker "Get Sh*t done!!!", decides which need his own time in the coming half-week, posts, updates or withdraws them in the Coordinator ledger (top half only), closes tasks he already closed from the Coordinator (safety net), shows a 5-line PRNTCODE pre-brief, flags his tasks with no D-Day, runs a silent Finance check (one time request when the monthly capital review is unopened or a non-"go" PO verdict is undecided, withdrawn once nothing is pending), and on Sundays links the Monday Pack as its own artifact. It ends by handing over to the Coordinator with the line "plan Khaled's half-week", so planning starts in the same chat. Use it for "/prntcode-ceo:refresh", "refresh PRNTCODE", "PRNTCODE refresh", "run the half-week refresh", "sync my PRNTCODE time", "what PRNTCODE time do I need". Never writes to any calendar; writes to Notion only through the close-task safety net.
+description: The PRNTCODE half-week refresh (Chief of Staff). Reads Khaled's tasks in the Notion tracker "Get Sh*t done!!!", posts, updates or withdraws the ones that need his time in the coming half-week in the Coordinator ledger (top half only), closes tasks he closed from the Coordinator (safety net), runs a silent Finance check, and builds a 5-line pre-brief with D-Day flags. Typed by hand it shows the pre-brief, links the Monday Pack on Sundays and hands over with "plan Khaled's half-week". As the Coordinator's feeder ("collect prntcode_refresh <date>", Sun and Wed 20:00) it runs the same steps silently and stores the pre-brief as its board line: no message, no Monday Pack, no handoff. Use for "/prntcode-ceo:refresh", "refresh PRNTCODE", "PRNTCODE refresh", "run the half-week refresh", "sync my PRNTCODE time", "what PRNTCODE time do I need", "collect prntcode_refresh <date>". Never writes to a calendar; writes to Notion only through the close-task safety net.
 ---
 
 # PRNTCODE half-week refresh: Notion → Coordinator ledger → planning
@@ -20,6 +20,33 @@ You are the **Chief of Staff** of Khaled's PRNTCODE agent. Twice a week, on **Su
 **The run, in order:** steps 0–6 (read, decide, write, safety net, withdraw) → **6b. the Finance check** → **7. the message** (pre-brief, D-Day flags, Monday Pack link on Sundays) → **8. the handoff** to the Coordinator.
 
 Read the whole file before starting. The **Hard rules** at the bottom take priority over everything else.
+
+## Collect mode (v2.4, silent)
+
+When the argument is **`collect prntcode_refresh <YYYY-MM-DD>`** (the Coordinator's `collect` skill sends it at 20:00 on Sundays and Wednesdays), this is a **feeder run** under the Coordinator's feeder contract. Nobody is reading this chat.
+
+1. **The half-week is the date given** (a Monday or a Thursday). `HW_END` is its last day (Wed or Sun) at 23:59 Abu Dhabi. Use it everywhere the table above would.
+2. **Run steps 0–6b exactly as written**, Finance check included. Same reads, same decisions, same writes: the step-5 upsert, `agent_withdraw`, the 6a safety net, the Finance row. A collect run writes the **same ledger rows** a manual refresh would.
+3. **Build step 7's message, but don't send it.** Store it as the board line instead (below). Skip **7e** (the Monday Pack is its own feeder now) and **step 8** (no handoff: the 21:00 plan opens by itself). No other text in the chat.
+4. **Record the run in one call** on the ledger project (`hgkreprqxevayruqpibf`):
+   ```sql
+   select status, attempts from public.prep_record('<HW>', 'prntcode_refresh', 'ok', null,
+     $j$[{"kind":"board_line","payload":{
+          "text":"<N> asks · <H>h · D-Day: <soonest D-Day from 7c>",
+          "sub":[{"label":"Finance","text":"<the 6b line without 'Finance: '>"}],
+          "prebrief":["<line 1>","<line 2>","<line 3>","<line 4>","<line 5>"],
+          "needs_you":"<the Needs you line, if any>"}}]$j$::jsonb);
+   ```
+   - `text`: `<N> asks` = PRNTCODE rows now `new` or `proposed`; `<H>h` = their total `duration_min` in hours (the `Nh open for you` figure); then `· D-Day: <project> <Dy D Mon>` for the soonest D-Day in 7c, if any. E.g. `3 asks · 4.5h · D-Day: Example Launch Sat 31 Oct`. Nothing open → `no asks this half-week`.
+   - `sub`: only when 6b found something pending (Finance's one line). Leave `sub` out otherwise. If 6b couldn't check, use `{"label":"Finance","text":"⚠ couldn't check (<why>)"}`.
+   - `prebrief`: the five pre-brief lines of step 7 (Critical, Waiting on you, D-Days, Ledger, No D-Day) as they would have been shown, empty ones left out. The plan shows them on "board".
+   - Use dollar-quoting for the JSON; if a value contains `$j$`, pick another tag.
+5. **If the run stops** (hard rule 7: a failed read, so nothing was written), record that instead, and still write nothing else:
+   `select status from public.prep_record('<HW>', 'prntcode_refresh', 'failed', $r$<why, one line, e.g. Notion unreachable>$r$);`
+   The plan's board then says `PRNTCODE ⚠ <why> · planning with the ledger as it is`.
+6. End with one line: `recorded ok` or `recorded failed: <why>`.
+
+**Typed by hand** ("refresh PRNTCODE", `/prntcode-ceo:refresh`, a run with no `collect` argument), the refresh behaves exactly as in 2.3.0: the full message, the Monday Pack on Sundays, and the handoff in step 8. It records nothing in `prep_runs`.
 
 ## 0. Load tools first
 
@@ -338,13 +365,13 @@ This agent can't remove a booked block, because only the Coordinator writes cale
 ## Hard rules
 
 1. **Notion is read-only here, except step 6a.** The only Notion writes are close-task's (one `Status` + one comment) on rows with `resolution` set. Never create, edit or archive anything else.
-2. **Only three ledger write paths:** the upsert in step 5 (also used by 6b for the one Finance row), `public.agent_withdraw`, and `public.agent_mark_tracker_closed` (step 6a). No `update`, no `delete`, no other function, and never the bottom-half columns or `resolution`.
+2. **Only three ledger write paths:** the upsert in step 5 (also used by 6b for the one Finance row), `public.agent_withdraw`, and `public.agent_mark_tracker_closed` (step 6a). No `update`, no `delete`, no other function, and never the bottom-half columns or `resolution`. In **collect mode** only, a fourth: one `public.prep_record` call for its own run and board line.
 3. **Never re-guess** duration, priority or context on a row that exists.
 4. **At most 8 new posts per run**, and only tasks that need his time this half-week (3f-bis).
 5. **Never post** an undated or recurring task, or one not assigned to Khaled. Overdue tasks are posted **only** through the catch-up rule (3c), never with their past due date.
 6. **Never write to a calendar.**
 7. **A failed read means no writes.** If Notion or the ledger can't be read, stop and say so plainly. Never fabricate a summary.
 8. A second run with no Notion changes must write **zero** rows. If you're about to write, check that a title or due date really changed.
-9. **Always end with the handoff (step 8)**, and never paste the Monday Pack into the chat.
+9. **Always end with the handoff (step 8)**, and never paste the Monday Pack into the chat. **Exception (v2.4): collect mode** sends no message, no Monday Pack and no handoff; it records its board line with `prep_record` and nothing else.
 10. **Never change a teammate's task.** The only tracker writes are close-task's, and only on tasks Khaled closed himself.
 11. **Finance rows are not tracker tasks.** Step 6 skips `sub_agent = 'finance'` rows; only step 6b posts or withdraws them, at most one open at a time. Step 6b only reads Finance's data; it never writes to the `finance` schema.

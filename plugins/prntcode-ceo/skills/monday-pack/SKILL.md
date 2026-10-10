@@ -1,11 +1,39 @@
 ---
 name: monday-pack
-description: Generate the PRNTCODE Monday Meeting Pack — a pre-meeting brief built from the Game Plan projects tracker and the Get Sh*t done!!! task tracker that shows what moved, what's stalled, what's overdue, and whether each project is on track for its D-Day. It doesn't just report — it PROPOSES back-planned due dates for undated tasks on near-term projects and flags tasks that appear to be MISSING based on what kind of project it is (event, collection, collab, shoot, pop-up). Use this skill whenever the user says "monday pack", "meeting pack", "prep the monday meeting", "are we on track", "what's falling behind", "project status check", "where are we on the trackers", or asks any question about overall project timelines, deadlines slipping, or readiness across PRNTCODE projects. Also runs as a scheduled task Monday mornings. Nothing is ever written to Notion without an approved proposal table.
+description: Generate the PRNTCODE Monday Meeting Pack: a pre-meeting brief from the Game Plan projects tracker and the Get Sh*t done!!! task tracker showing what moved, what's stalled, what's overdue, and whether each project is on track for its D-Day. It PROPOSES back-planned due dates for undated tasks on near-term projects and flags tasks that seem MISSING for that kind of project (event, collection, collab, shoot, pop-up). Use for "monday pack", "meeting pack", "prep the monday meeting", "are we on track", "what's falling behind", "project status check", "where are we on the trackers", any question about project timelines or slipping deadlines, the replies "pack 1 3" / "pack all" / "pack none", and "collect monday_pack <date>" (the Coordinator's Sunday feeder: builds the pack as its own artifact and leaves the link and proposals in the ledger). Nothing is ever written to Notion without an approved proposal.
 ---
 
 # PRNTCODE Monday Meeting Pack
 
 Build the brief that runs the Monday meeting: per-project timeline health, week-over-week movement, and a numbered proposal queue of concrete fixes (dates to set, tasks to create, questions to resolve). The pack is read-heavy and write-never — all writes go through numbered proposals the user approves explicitly, matching the meeting-tasks skill convention.
+
+## Collect mode (v2.4, the Sunday feeder)
+
+When the argument is **`collect monday_pack <YYYY-MM-DD>`** (sent by the Coordinator's `collect` skill on Sundays at 20:00), this is a silent **feeder run** under the Coordinator's feeder contract. Nobody is reading this chat.
+
+1. Run **steps 1–4** as written (read-only: Notion, the archive diff, the ledger's time asks).
+2. Build the pack (step 5's shape) as **its own artifact**, titled `Monday Pack — Mon <D Mon>` for the Monday given, with a numbered proposal queue as usual. Don't paste it into the chat.
+3. **Store the proposal queue in the ledger**, so the approval can come later from any chat. One call on the ledger project (`hgkreprqxevayruqpibf`):
+   ```sql
+   select status from public.prep_record('<YYYY-MM-DD>', 'monday_pack', 'ok', null,
+     $j$[{"kind":"board_line","payload":{"text":"ready for your Monday block · <n> proposals","url":"<artifact url>"}},
+         {"kind":"link","payload":{"text":"Monday Pack — Mon <D Mon>","url":"<artifact url>",
+            "proposals":[{"n":1,"type":"date","project_url":"…","task_url":"…","title":"…","date":"YYYY-MM-DD","note":"…"},
+                         {"n":2,"type":"new_task","project_url":"…","title":"…","date":"YYYY-MM-DD","archetype":"…"},
+                         {"n":3,"type":"question","project_url":"…","text":"…"}]}}]$j$::jsonb);
+   ```
+   Every proposal carries what step 6 needs to execute it (page URLs, the exact title, the date).
+4. **Writes nothing else.** No Notion page (not even the archive in step 7: that happens after Khaled's reply), no Todoist, no message. If artifacts can't be made in this runtime, record `failed` with `couldn't create the pack artifact` (never the Notion fallback in collect mode).
+5. If a read fails, record `failed` with the reason (`select status from public.prep_record('<YYYY-MM-DD>', 'monday_pack', 'failed', $r$<why>$r$);`) and stop.
+6. End with one line: `recorded ok` or `recorded failed: <why>`.
+
+**Approving later: `pack 1 3` / `pack all` / `pack none`** (in the planning chat, the pack's chat, or anywhere). If this chat doesn't hold the pack, read the latest stored one:
+```sql
+select payload from public.prep_outputs
+where feeder_key = 'monday_pack' and kind = 'link'
+order by half_week_start desc limit 1;
+```
+Then follow **step 6** on exactly those numbered proposals, and **step 7** to archive (the rendered pack from the artifact, the Declined note, the snapshot). The approval is never applied by the Coordinator's "book it": the planning chat hands `pack …` straight to this skill.
 
 ## Prerequisites: load tools first
 
@@ -101,7 +129,7 @@ Generate a numbered proposal queue. Three proposal types:
 
 ### 5. Present the pack (phone-readable)
 
-**When the refresh runs it on Sunday (refresh step 7e)**, the pack is **its own artifact**: a separate document titled `Monday Pack — Mon 5 Oct`. If the runtime can't make artifacts, it's the Notion archive page from step 7. The chat gets only a one-line link, never the pack itself. Asked directly ("monday pack"), present it in chat as before.
+**In collect mode, and when a refresh typed by hand runs it on Sunday (refresh step 7e)**, the pack is **its own artifact**: a separate document titled `Monday Pack — Mon 5 Oct`. If the runtime can't make artifacts, it's the Notion archive page from step 7. The chat gets only a one-line link, never the pack itself. Asked directly ("monday pack"), present it in chat as before.
 
 Order: worst first. Structure:
 

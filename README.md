@@ -2,7 +2,10 @@
 
 ![PRNTCODE CEO agent org chart: CEO router at the top, the live Chief of Staff feeding the Coordinator ledger, Legal live on Anthropic's legal plugin, Finance live, Operations, Marketing and Sales partly live, and two charter-only departments](docs/org-chart.svg)
 
-Khaled's PRNTCODE agent, **v2.3.0** (Finance goes live: forecast, scenarios, capital review and PO checks, 9 Oct 2026). The **CEO** is a thin router. The **Chief of Staff** is live:
+Khaled's PRNTCODE agent, **v2.4.0** (the half-week routine: PRNTCODE becomes a silent feeder, 10 Oct 2026). The **CEO** is a thin router. The **Chief of Staff** is live:
+
+> **v2.4: the half-week routine.** Sunday and Wednesday evenings are now two runs, owned by the Coordinator. At **20:00** the Coordinator's silent **collect** runs each feeder in its registry; PRNTCODE's two are the **refresh** (Sun + Wed) and the **Monday Pack** (Sun). Nothing reaches your phone. At **21:00** the Coordinator's planning chat opens with a push and shows each feeder's line on its **board**, e.g. `PRNTCODE ✓ 3 asks · 4.5h · D-Day: Example Launch Sat 31 Oct` and `Finance ✓ September review unopened`. In collect mode the refresh does exactly the same steps 0–6b (Finance check included) and writes the same ledger rows, but stores its pre-brief as its board line: no message, no Monday Pack, no handoff. The Monday Pack builds its own artifact and leaves the link on the board; you still approve its proposals with `pack 1 3`, from the planning chat or anywhere. **Typing `refresh PRNTCODE` yourself behaves exactly as in 2.3.0.** The contract both follow is [`docs/feeder-contract.md`](https://github.com/thevault-dev/coordinator/blob/main/docs/feeder-contract.md) in the coordinator repo. Checks: [`docs/verification-2026-10-10-half-week.md`](docs/verification-2026-10-10-half-week.md).
+
 
 - **Refresh** (`/prntcode-ceo:refresh`, **Sun and Wed 20:00 Abu Dhabi**): reads the team tracker "Get Sh\*t done!!!", decides which of *your* tasks need your time in the coming half-week, and posts them to your Coordinator ledger. Then it shows a ≤5-line PRNTCODE pre-brief, flags your tasks with no D-Day, and on Sundays links the Monday Pack. It ends with `plan Khaled's half-week`, so the Coordinator starts planning in the same chat. It replaces the daily 06:30 sync.
 - **What now** (the `what-now` skill): in a focus block, say "what do you need from me now?", "PRNTCODE focus, what's next?" or "I have 90 minutes, what should I do?". You get the 1–3 tasks that fit your time, each with its first concrete step. Reply `done` (closes it in the tracker), `next` or `skip`.
@@ -83,7 +86,11 @@ Both are in **Customize → Connectors**.
 
 Quick test: in a new chat, type **"sync my PRNTCODE time"**. If a connector is missing, the agent names it and writes nothing.
 
-## 3. Scheduled tasks (v2: Sunday and Wednesday 20:00)
+## 3. Scheduled tasks (v2.4: owned by the Coordinator)
+
+**From v2.4 PRNTCODE has no Sun/Wed task of its own.** The Coordinator's **"Half-week collect"** (Sun + Wed 20:00, notifications off) runs the refresh and the Monday Pack as feeders, and **"Half-week plan"** (Sun + Wed 21:00, push on) opens planning. Their names, times and prompts are in `BUILD_REPORT_V2_3.md` in the coordinator repo. **Switch off the two "Sun and Wed Planner" tasks** below (the `PRNTCODE + plan` ones) once those two exist; otherwise the refresh runs twice and you get two planning chats. The Finance daily task stays as it is.
+
+### Before v2.4 (kept for reference)
 
 **Switch off the old one:** **Cowork → Scheduled → "PRNTCODE sync"** (`/prntcode-ceo:sync`, daily 06:30) → turn it off or delete it. Also switch off the Coordinator's **07:00** `/coordinator:daily-run` task. If either fires anyway, it only replies "retired, switch me off".
 
@@ -98,7 +105,7 @@ The run stops at the Coordinator's "Anything else booked?" and waits for your re
 
 **Finance daily (v2.3), one more task.** Create it on the **claude.ai Scheduled page** (not from a Claude Code session: tasks made inside a session run without connectors). Name, time and prompt are in [`BUILD_REPORT_FINANCE.md`](BUILD_REPORT_FINANCE.md#the-scheduled-task); copy them exactly.
 
-**Monday Pack:** on Sundays the refresh makes it as its own artifact and links it in one line. You can turn off any separate Monday-morning pack task, or keep it if you still want it on Monday morning.
+**Monday Pack:** on Sundays the refresh makes it as its own artifact and links it in one line. You can turn off any separate Monday-morning pack task, or keep it if you still want it on Monday morning. (v2.4: the 20:00 collect builds it as its own feeder; the link is on the 21:00 board.)
 
 ---
 
@@ -106,7 +113,9 @@ The run stops at the Coordinator's "Anything else booked?" and waits for your re
 
 | Say | What happens |
 |---|---|
-| `refresh PRNTCODE` or `/prntcode-ceo:refresh` | Runs the half-week refresh now: pre-brief, then the Coordinator plan |
+| `refresh PRNTCODE` or `/prntcode-ceo:refresh` | Runs the half-week refresh now: pre-brief, then the Coordinator plan (exactly as in 2.3.0) |
+| `collect prntcode_refresh 2026-10-12` · `collect monday_pack 2026-10-12` | Feeder runs (v2.4), sent by the Coordinator's collect. Silent: they only write the ledger and their board line |
+| `pack 1 3` · `pack all` · `pack none` | Approves the Monday Pack's proposals, from any chat (v2.4: read from the ledger if the pack isn't in this chat) |
 | `what do you need from me now?` · `PRNTCODE focus, what's next?` · `I have 90 minutes, what should I do?` | 1–3 tasks that fit your time, each with a first step. Then `done` / `next` / `skip` |
 | `show details` (after a refresh) | The full Posted / Updated / Withdrawn / Skipped lists |
 | `monday pack` or `/prntcode-ceo:monday-pack` | The Monday Pack, with **Your time asks** |
@@ -347,6 +356,7 @@ supabase/migrations/                   the `finance` schema for PRNTCODE-ops (st
 docs/org-chart.svg                     the chart above
 docs/coordinator-handoff.md            what the coordinator repo needs
 docs/verification-2026-10-09-finance.md  Finance v1 checks (made-up numbers only)
+docs/verification-2026-10-10-half-week.md  v2.4 half-week routine checks (feeders)
 tests/prntcode_contract_check.sql      ledger contract self-test
 tests/finance_ledger_check.sql         Finance row self-test (rolls itself back)
 tests/finance_schema_check.sql         finance schema self-test, PRNTCODE-ops (rolls itself back)
@@ -370,4 +380,4 @@ Guess-accuracy tracking (planned for the Auditor), reopening declined items when
 | A legal review says it used generic or US-law standards | Either you called a `legal:` skill directly (ask through the PRNTCODE agent instead), or the section it needed is still `_TBD_` in [`legal.local.md`](plugins/prntcode-ceo/org/legal/legal.local.md). |
 | A task you need time for was "No block needed" | Add a word to the task title or Notes that makes it clear you must do it ("review…", "decide…", "write…"). The next sync re-judges it. |
 
-**Version:** 2.3.0 (Finance live: `forecast`, `scenario`, `capital-review`, `po-check` and the scheduled `finance-daily`, with its own `finance` schema in PRNTCODE-ops; `ceo` routes money questions to Finance, `what-now` shows the Finance status line and ranks Finance items among its picks, `refresh` runs a silent Finance check, and the withdraw sweep and `close-task` leave Finance rows alone). 2.2.0 (meeting-tasks, prntcode-catalogue-review, prntcode-brand-formatter and prntcode-pricing move into the repo unchanged; Marketing's charter follows the 2 Oct review). 2.1.0 made Legal live: the CEO routes legal asks to Anthropic's legal plugin with PRNTCODE's playbook. 2.0.0 brought the half-week refresh with handoff to Coordinator planning, what-now and the Monday Pack as an artifact; the daily sync is retired. The refresh keeps every v1 sync rule below; what changed is when it runs, the 'this half-week' filter (3f-bis), and the message it ends with.
+**Version:** 2.4.0 (the half-week routine: `refresh` gets a silent collect mode for the Coordinator's 20:00 collect, storing its pre-brief and Finance line as its board line with no message, Monday Pack or handoff; `monday-pack` becomes its own Sunday feeder that leaves a link and its proposal queue in the ledger, approved later with `pack 1 3`; the manual refresh is unchanged). 2.3.0 (Finance live: `forecast`, `scenario`, `capital-review`, `po-check` and the scheduled `finance-daily`, with its own `finance` schema in PRNTCODE-ops; `ceo` routes money questions to Finance, `what-now` shows the Finance status line and ranks Finance items among its picks, `refresh` runs a silent Finance check, and the withdraw sweep and `close-task` leave Finance rows alone). 2.2.0 (meeting-tasks, prntcode-catalogue-review, prntcode-brand-formatter and prntcode-pricing move into the repo unchanged; Marketing's charter follows the 2 Oct review). 2.1.0 made Legal live: the CEO routes legal asks to Anthropic's legal plugin with PRNTCODE's playbook. 2.0.0 brought the half-week refresh with handoff to Coordinator planning, what-now and the Monday Pack as an artifact; the daily sync is retired. The refresh keeps every v1 sync rule below; what changed is when it runs, the 'this half-week' filter (3f-bis), and the message it ends with.
