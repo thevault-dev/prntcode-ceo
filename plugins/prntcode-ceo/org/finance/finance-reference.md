@@ -74,7 +74,7 @@ Use `$q$…$q$` dollar-quoting for text and `'…'::jsonb` for JSON in every cal
 
 1. **Cash floor**: ask once, store `cash_floor`.
 2. **Upcoming launches**: show what Ops has (name, line, date) and anything that looks off (a placeholder date, a collection with no products yet). Corrections go in the Ops reference sheet, not here.
-3. **Recurring costs**: show the list the forecast treats as recurring (forecast §4), one line each with its recent monthly level, and take corrections ("Klaviyo is cancelled", "the shoot isn't recurring"). Store as `recurring_costs`.
+3. **Recurring costs**: show the list the forecast treats as recurring (forecast §4), one line each with its recent monthly level, and take corrections ("Klaviyo is cancelled", "the shoot isn't recurring", "the studio is quarterly"). Store as `recurring_costs` (shape in `forecast` §4; quarterly and yearly costs need `every` and `next_due`). New people on payroll are not a recurring-cost correction: they're a `cost` scenario made real, because Zoho has no history for them yet.
 4. **Partner payment terms** (optional): "Deepwear takes 50% when the PO is sent and the rest on delivery". Store per Ops `partner_id` in `partner_payment_terms`. Default without terms: the full PO amount goes out the day it's sent.
 5. `months_cover_target` = 3 unless he says otherwise. Set `setup_done` to today.
 6. Reply in one line: `Finance set up · floor set · 2 launches · 14 recurring costs`.
