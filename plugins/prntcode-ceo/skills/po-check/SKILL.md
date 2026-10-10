@@ -37,7 +37,7 @@ PO spend = Σ `qty_ordered × unit_cost`, in AED (convert the PO currency). Timi
 ## 3. Is the quantity right?
 
 For each SKU line:
-- **Sales pace** = units sold per month over the last 90 days (Shopify `FROM sales SHOW net_items_sold GROUP BY product_variant_sku SINCE -90d UNTIL today`, ÷ 3). If the SKU had a launch in that window, also show the pace since the launch window ended. A launch coming up for its line (settings `launches`) raises the pace by that launch's bump share, labelled.
+- **Sales pace** = units sold per month over the last 90 days (Shopify `FROM sales SHOW net_items_sold GROUP BY product_variant_sku SINCE -90d UNTIL today`, ÷ 3). If the SKU had a launch in that window, also show the pace since the launch window ended. A launch coming up for its line (Ops collections, as read by `forecast` §2) raises the pace by that launch's bump share, labelled.
 - **On hand** = Ops `public.sellable_stock_v.on_shelf` + other stock locations (`stock_by_location_v`, not `shipped`), plus anything already on order (`po_on_order_v.qty_outstanding`).
 - **Months of cover after receipt** = (on hand + on order + this PO's qty − pace × lead months) ÷ pace, where lead months = `lead_days_observed` (or the partner's usual lead time) ÷ 30.
 - **Over target** when cover > `months_cover_target` × 1.5. **Suggested qty** = the quantity that gives exactly the target cover, rounded up to the line's MOQ or pack size if there is one; **AED saved** = (ordered − suggested) × unit cost.

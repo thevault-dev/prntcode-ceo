@@ -262,14 +262,15 @@ To run it: **Supabase → coordinator → SQL Editor → New query →** paste t
 
 | Say | What you get |
 |---|---|
-| `set up Finance` | Once: your cash floor, your upcoming launches (name, product line, date), the list of costs it treats as recurring (correct it in chat), and any supplier payment terms |
+| `set up Finance` | Once: your cash floor, a check of the launches it reads from the Ops reference sheet, the list of costs it treats as recurring (correct it in chat), and any supplier payment terms |
 | `how's cash?` · `what's the forecast?` | 8 lines or fewer: cash today (LLC Wio bank balance), the 8-week and 12-month low points against your floor, 12-month profit, launches and their bump ranges, scenarios made real, draft POs pending. `chart` for the branded chart; `show the months` / `show the weeks` for the tables |
 | `what if we hire a third tailor in January?` · `workshop at AED 8k a month` · `Wildflower slips to May` · `Ounass takes 200 pieces at wholesale` · `raise prices 10%` · `I put in AED 50k in November` | The changes and assumptions it used, a base-vs-scenario chart (cash and monthly profit), four numbers (lowest cash and when, months above the floor, change in 12-month profit, payback) and a one-line verdict |
 | `make the hire start in February` · `stack it with the workshop` · `save it as tailor` · `compare tailor, workshop and both` | Adjust, stack, save and compare (up to three) |
 | `make it real` · `drop it` | Adds the scenario to the base forecast (after a yes), or archives it |
 | `check PO 0012` | Can we afford it, is the quantity right, could it wait → `go`, `go smaller` (quantity and AED saved) or `wait until <date>` |
 | `open the review` (or pick it in a PRNTCODE block) | The monthly capital efficiency review: up to five moves ranked by the AED they free or earn over 90 days, each with its evidence; `simulate 2` opens move 2 as a scenario |
-| `Wildflower launches 15 April` · `rent isn't recurring` · `set the floor to AED 20k` | Updates a setting, after a one-line confirmation |
+| `rent isn't recurring` · `set the floor to AED 20k` | Updates a setting, after a one-line confirmation |
+| `Wildflower launches 15 April` | Shows the date Ops has. Launch dates live only in the Ops reference sheet (collections tab); change them there |
 
 (Example amounts are made up.)
 
@@ -287,7 +288,7 @@ A quiet day sends nothing.
 ### How the forecast works
 
 - **Cash today** is the LLC Wio bank balance alone.
-- **B2C sales** come from Shopify, excluding VAT: a quiet-month baseline plus a bump for each launch you entered, sized from comparable past launches and shown as a low–high range. Seasonality (Ramadan and Eid, December, summer) is labelled low confidence: there's only one of each in the history.
+- **B2C sales** come from Shopify, excluding VAT: a quiet-month baseline plus a bump for each upcoming launch in the Ops reference sheet (product line read from the collection's products), sized from comparable past launches and shown as a low–high range. Seasonality (Ramadan and Eid, December, summer) is labelled low confidence: there's only one of each in the history.
 - **B2B sales** come from Zoho invoices, leaving out the customer "Shopfy" (Shopify sales posted to Zoho) and drafts. Open invoices arrive on their due date, pushed back by that customer's usual lateness.
 - **Costs** that show up most months are carried forward at their recent level; one-offs aren't; unpaid bills go out on their due dates.
 - **Stock spend** comes from Ops POs (approved, sent and partial are committed; drafts are shown as pending). Until Ops raises its first PO, it comes from past production and material spend in Zoho.

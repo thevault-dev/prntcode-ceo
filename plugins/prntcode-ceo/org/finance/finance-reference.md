@@ -50,7 +50,7 @@ Migration: `supabase/migrations/20261009103151_finance_schema.sql` (+ `…103332
 
 | Table | Holds | Write with |
 |---|---|---|
-| `finance.settings` (key → jsonb) | `cash_floor`, `months_cover_target` (default 3), `launches`, `recurring_costs`, `partner_payment_terms`, `baseline_calibration`, `setup_done` | `finance.set_setting(key, value)` |
+| `finance.settings` (key → jsonb) | `cash_floor`, `months_cover_target` (default 3), `recurring_costs`, `partner_payment_terms`, `baseline_calibration`, `setup_done` | `finance.set_setting(key, value)` |
 | `finance.forecast_snapshots` | one per month, saved on the 3rd | `finance.save_snapshot(month, months, weeks, assumptions)` (a second save the same month keeps the first), `finance.score_snapshot(month, actual, sales_err, costs_err, cash_err)` |
 | `finance.scenarios` | name, ask, changes, assumptions, status `draft` / `base` / `dropped` | `finance.save_scenario(name, ask, changes, assumptions)` (drafts only), `finance.set_scenario_status(name, status)` |
 | `finance.po_checks` | PO number, fingerprint, verdict, quantity, AED saved, wait-until, reasons | `finance.record_po_check(…)` (same PO + fingerprint writes nothing) |
@@ -66,12 +66,14 @@ select key, value from finance.settings;
 ```
 Use `$q$…$q$` dollar-quoting for text and `'…'::jsonb` for JSON in every call.
 
-**Settings by chat** ("set the floor to AED 20k", "Wildflower launches 15 Apr", "rent isn't recurring, it's annual"): confirm in one line first (`Set cash floor → AED 20,000? (yes/no)`), then call `finance.set_setting`. Launches and recurring costs are read, changed and written back as a whole JSON value.
+**Settings by chat** ("set the floor to AED 20k", "rent isn't recurring, it's annual"): confirm in one line first (`Set cash floor → AED 20,000? (yes/no)`), then call `finance.set_setting`. Recurring costs are read, changed and written back as a whole JSON value.
+
+**Launch dates are not a setting.** They come only from the Ops reference sheet (collections tab → `public.collections`), with each collection's product line read from its products (`forecast` §2). A date change in chat is pointed back to the sheet; a "what if" is a scenario. Never store a `launches` setting.
 
 ## Setup ("set up Finance", or the first time `setup_done` is missing)
 
 1. **Cash floor**: ask once, store `cash_floor`.
-2. **Upcoming launches**: ask once for each upcoming launch: name, product line (RTW, abayas, jalabiyas, swimwear…), date. Store as `launches` `[{"name":…, "line":…, "date":"YYYY-MM-DD"}]`.
+2. **Upcoming launches**: show what Ops has (name, line, date) and anything that looks off (a placeholder date, a collection with no products yet). Corrections go in the Ops reference sheet, not here.
 3. **Recurring costs**: show the list the forecast treats as recurring (forecast §4), one line each with its recent monthly level, and take corrections ("Klaviyo is cancelled", "the shoot isn't recurring"). Store as `recurring_costs`.
 4. **Partner payment terms** (optional): "Deepwear takes 50% when the PO is sent and the rest on delivery". Store per Ops `partner_id` in `partner_payment_terms`. Default without terms: the full PO amount goes out the day it's sent.
 5. `months_cover_target` = 3 unless he says otherwise. Set `setup_done` to today.

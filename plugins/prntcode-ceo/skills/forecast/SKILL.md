@@ -25,7 +25,19 @@ FROM sales SHOW net_sales, orders TIMESERIES month SINCE 2025-06-01 UNTIL today
 ```
 `net_sales` is ex-VAT, net of discounts and returns. × `baseline_calibration.b2c` (default 1).
 
-**Launches.** Upcoming: `settings.launches` (name, line, date). Past, to learn from: launches in `settings.launches` with past dates, plus Ops `public.collections.launch_date` (read-only). A **launch window** is the launch month and the month after.
+**Launches** come from **one place: the Ops reference sheet**, synced to Ops `public.collections` (read-only). Finance never keeps its own copy of a launch date.
+```sql
+select c.collection_id, c.name, c.launch_date, c.status,
+       (select p.product_type from public.products p
+         where p.collection_id = c.collection_id and p.active and p.product_type <> 'Accessories'
+         group by p.product_type order by count(*) desc limit 1) as line
+from public.collections c
+where c.active and c.launch_date is not null
+order by c.launch_date;
+```
+- A **launch window** is the launch month and the month after. A collection whose window reaches M0 or later is **upcoming**; an earlier one is **past**, to learn from.
+- **Line** = the most common `product_type` among the collection's active products (accessories left out). A collection with no products yet has no line: use all past launches as comparables and say `Wildflower: line not set in Ops, compared with all launches`.
+- A collection with no `launch_date`, or a product line Khaled mentions that isn't in the sheet (swimwear), isn't forecast: list it once (`Swimwear: not in the Ops reference sheet, no launch bump`).
 
 **Quiet-month baseline** = the median monthly `net_sales` over the last 12 complete months, leaving out launch windows and the seasonal months below.
 
@@ -34,7 +46,7 @@ FROM sales SHOW net_sales, orders TIMESERIES month SINCE 2025-06-01 UNTIL today
 - A past launch whose bump comes out at or below zero (a collection date that's only a placeholder, or a launch that didn't move sales) isn't a comparable: leave it out and list it (`Jungle Edit Abaya Jan: no clear bump, not used`).
 - **Low–high range** = the smallest and largest comparable bump. With only one comparable, use ±30% of it. Spread it like the past launches did (default 70% in the launch month, 30% the month after).
 - The forecast uses the **midpoint**; every output shows the range: `Wildflower Apr: bump AED 40–90k`.
-- Moving a launch's date (in settings or by a scenario) moves its bump with it.
+- Moving a launch's date (in the Ops reference sheet, or by a scenario) moves its bump with it.
 
 **Seasonality** (Ramadan and Eid, December, summer Jul–Aug): factor = last year's same month ÷ baseline, after taking out any launch in that month. History has **one** of each, so always label it `low confidence`. If a season's only example was a launch month (summer 2026 was the Jungle Edit launch), use no factor and say `summer factor unknown (only a launch month to learn from)`.
 
@@ -120,7 +132,9 @@ Accuracy 86% (3 months) · say "chart" for the chart
 4. **Recalibrate** from the miss: if last month wasn't a launch window, `b2c` factor ← factor × (1 + 0.5 × (actual ÷ forecast − 1)), kept between 0.7 and 1.3; the same for `b2b` and `costs`. `finance.set_setting('baseline_calibration', …)`. Say what changed: `Baseline −6% (Sep sales came in under)`.
 
 ## 11. Settings by chat
-Floor, launches ("Wildflower slips to May" as a *fact* changes the setting; as a *what if* it's a scenario), recurring corrections and partner terms: confirm in one line, then `finance.set_setting` (reference). "What's recurring?" lists the recurring costs with their monthly level.
+Floor, recurring corrections and partner terms: confirm in one line, then `finance.set_setting` (reference). "What's recurring?" lists the recurring costs with their monthly level.
+
+**Launch dates aren't a Finance setting.** "Wildflower slips to May" as a *fact*: reply that the date lives in the Ops reference sheet (collections tab) and the forecast picks it up after the next reference sync; Finance doesn't write to Ops. As a *what if*, it's a scenario. "Wildflower launches 15 April": show the date Ops has now, and if it differs, the same pointer to the sheet.
 
 ## Rules
 1. Cash today is the LLC Wio bank-feed balance alone.
